@@ -18,3 +18,8 @@ This is a bot for my Discord server.
 - Querying API is tough
 - There's no such thing as free hosting
 - How to scrape from HTML
+
+# To-do
+- ?info - Add co-ability information
+- ?info - Add passive ability information
+- ?info - Add flavor text

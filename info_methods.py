@@ -56,7 +56,7 @@ def get_image(entityType, rarity, entityID, variation):
         return link
 
 
-def get_skill(skillName, maxSkillLevel):
+def get_skill(entityType, skillName, maxSkillLevel):
     """
     Retrieves skill description.
     :param skillName: string representing skill name
@@ -64,6 +64,7 @@ def get_skill(skillName, maxSkillLevel):
     :return: string containing the concatenated description
     """
     skillDescription = ""
+    skillCost = ""
     urlPart = skillName.replace(" ", "_")
     response = requests.get(f"https://dragalialost.gamepedia.com/index.php?title={urlPart}&action=pagevalues")
     html = response.text
@@ -73,13 +74,14 @@ def get_skill(skillName, maxSkillLevel):
     for trTag in rawTable:
         tdTags = trTag.find_all("td")
         if tdTags[0].string == "Description3" and tdTags[0].string == maxSkillLevel:
-            for i in tdTags[1]:
-                if i.string is not None:
-                    skillDescription += i.string
+            skillDescription = tdTags[1].get_text()
         elif tdTags[0].string == "Description2" and tdTags[0].string == maxSkillLevel:
-            for i in tdTags[1]:
-                if i.string is not None:
-                    skillDescription += i.string
+            skillDescription = tdTags[1].get_text()
+        if tdTags[0].string == "Sp":
+            skillCost = tdTags[1].get_text()
+    if entityType == "adventurer":
+        skillDescription = skillDescription + " [" + skillCost + " SP]"
+
     return skillDescription
 
 
