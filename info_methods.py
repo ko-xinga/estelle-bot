@@ -1,6 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 
+JUICY_MEAT = "1"
+KALEIDOSCOPE = "2"
+FLORAL_CIRCLET = "3"
+COMPELLING_BOOK = "4"
+MANA_ESSENCE = "5"
 
 def make_dict(entityName):
     """
@@ -32,7 +37,7 @@ def make_dict(entityName):
 
 def get_image(entityType, rarity, entityID, variation):
     """
-    Retrieves thumbnail of entity
+    Retrieves thumbnail of entity.
     :param entityType: string representing if the entity is an adventurer or dragon
     :param rarity: integer representing the rarity of the entity
     :param entityID: integer representing the ID of the entity
@@ -59,6 +64,7 @@ def get_image(entityType, rarity, entityID, variation):
 def get_skill(entityType, skillName, maxSkillLevel):
     """
     Retrieves skill description.
+    :param entityType: string representing if the entity is an adventurer or dragon
     :param skillName: string representing skill name
     :param maxSkillLevel: string representing highest level the skill can become
     :return: string containing the concatenated description
@@ -80,16 +86,47 @@ def get_skill(entityType, skillName, maxSkillLevel):
         if tdTags[0].string == "Sp":
             skillCost = tdTags[1].get_text()
     if entityType == "adventurer":
-        skillDescription = skillDescription + " [" + skillCost + " SP]"
+        skillDescription = skillDescription.rstrip() + " [" + skillCost + " SP]"
 
     return skillDescription
 
 
+def get_footer(entityDict):
+    """
+    Returns the concatenated footer containing misc. info.
+    :param entityDict: dict containing entity info
+    :return: concatenated string containing misc. info
+    """
+    if entityDict["entityType"] == "adventurer":
+        return entityDict["Rarity"] + "* | " + entityDict["ElementalType"] + " | " + \
+               entityDict["WeaponType"] + " | " + entityDict["CharaType"]
+    elif entityDict["entityType"] == "dragon":
+        return entityDict["Rarity"] + "* | " + entityDict["ElementalType"]
+
+
+def get_favorite(gift):
+    """
+    Returns the dragon's favorite roost item.
+    :param gift: string representing a value of which roost item is preferred by the dragon
+    :return: string containing hard-coded value
+    """
+    if gift == JUICY_MEAT:
+        return "Juicy Meat (Monday)"
+    if gift == KALEIDOSCOPE:
+        return "Kaleidoscope (Tuesday)"
+    if gift == FLORAL_CIRCLET:
+        return "Floral Circlet (Wednesday)"
+    if gift == COMPELLING_BOOK:
+        return "Compelling Book (Thursday)"
+    if gift == MANA_ESSENCE:
+        return "Mana Essence (Friday)"
+
+
 def pretty_print(skillName, description):
     """
-    Formats the skill and its description so they can be embedded into Discord
+    Formats the skill and its description so they can be embedded into Discord.
     :param skillName: string representing skill name
     :param description: string representing lengthy skill description
     :return: formatted string
     """
-    return "**" + skillName + "** " + description
+    return "**" + skillName + "**: " + description

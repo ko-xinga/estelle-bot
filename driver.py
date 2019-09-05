@@ -18,20 +18,26 @@ async def on_ready():
 
 
 @bot.command()
-async def notte(ctx):
-    await ctx.send("Sweet sassy molassy!")
+async def commands(ctx):
+    """
+    Displays a list of available commands.
+    :param ctx: Context command was issued
+    :return: None
+    """
+    file = open("commandsList.txt", "r")
+    await ctx.send(file.read())
+    file.close()
 
 
 @bot.command()
 async def info(ctx, *, arg: str):
     """
-    Sends an embedded Wiki entry about that entity
+    Retrieves information about the adventurer/dragon and prints it to the Discord text channel.
     :param ctx: Context command was issued
     :param arg: String entered in by user containing entity name
     :return: None
     """
     entity = arg
-    entityDict = {}
 
     try:
         entityDict = info_methods.make_dict(entity)
@@ -43,7 +49,6 @@ async def info(ctx, *, arg: str):
                 embed = discord.Embed(title="Adventurer", description=entityDict["FullName"], color=0x3D85C6)
                 imageLink = info_methods.get_image(entityDict["entityType"], entityDict["Rarity"],
                                                    entityDict["Id"], entityDict["VariationId"])
-                embed.set_thumbnail(url=imageLink)
                 skillDescriptionOne = info_methods.pretty_print(entityDict["Skill1Name"],
                                                                 info_methods.get_skill(entityDict["entityType"],
                                                                                        entityDict["Skill1Name"],
@@ -52,22 +57,37 @@ async def info(ctx, *, arg: str):
                                                                 info_methods.get_skill(entityDict["entityType"],
                                                                                        entityDict["Skill2Name"],
                                                                                        MAX_LEVEL_TWO))
+                footer = info_methods.get_footer(entityDict)
+                embed.set_thumbnail(url=imageLink)
                 embed.add_field(name="Skill 1", value=skillDescriptionOne, inline=False)
                 embed.add_field(name="Skill 2", value=skillDescriptionTwo, inline=False)
-                embed.set_author(name="Dragalia Lost Wiki", url="https://dragalialost.gamepedia.com")
+                embed.set_footer(text=footer)
                 await ctx.send(embed=embed)
             elif entityDict["entityType"] == "dragon":
                 embed = discord.Embed(title="Dragon", description=entityDict["FullName"], color=0x3D85C6)
                 imageLink = info_methods.get_image(entityDict["entityType"], entityDict["Rarity"],
                                                    entityDict["BaseId"], entityDict["VariationId"])
-                embed.set_thumbnail(url=imageLink)
                 skillDescriptionOne = info_methods.pretty_print(entityDict["SkillName"],
                                                                 info_methods.get_skill(entityDict["entityType"],
                                                                                        entityDict["SkillName"],
                                                                                        MAX_LEVEL_TWO))
+                favoriteGift = info_methods.get_favorite(entityDict["FavoriteType"])
+                footer = info_methods.get_footer(entityDict)
+                embed.set_thumbnail(url=imageLink)
                 embed.add_field(name="Skill", value=skillDescriptionOne, inline=False)
-                embed.set_author(name="Dragalia Lost Wiki", url="https://dragalialost.gamepedia.com")
+                embed.add_field(name="Favorite Gift", value=favoriteGift, inline=False)
+                embed.set_footer(text=footer)
                 await ctx.send(embed=embed)
+
+
+@bot.command()
+async def notte(ctx):
+    """
+    Sends a fun message.
+    :param ctx: Context command was issued
+    :return: None
+    """
+    await ctx.send("Sweet sassy molassy!")
 
 
 bot.run(TOKEN)
