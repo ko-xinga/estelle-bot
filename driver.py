@@ -39,12 +39,14 @@ async def info(ctx, *, arg: str):
     """
     entity = arg
 
+    # check if adventurer or dragon exists first
     try:
         entityDict = info_methods.make_dict(entity)
     except AttributeError:
         await ctx.send(f"{entity} does not exist. Are you sure you spelled their name right?")
     else:
         if "adventurer" or "dragon" in entityDict:
+            # make embed for adventurer info
             if entityDict["entityType"] == "adventurer":
                 embed = discord.Embed(title="Adventurer", description=entityDict["FullName"], color=0x3D85C6)
                 imageLink = info_methods.get_image(entityDict["entityType"], entityDict["Rarity"],
@@ -63,6 +65,8 @@ async def info(ctx, *, arg: str):
                 embed.add_field(name="Skill 2", value=skillDescriptionTwo, inline=False)
                 embed.set_footer(text=footer)
                 await ctx.send(embed=embed)
+
+            # make embed for dragon info
             elif entityDict["entityType"] == "dragon":
                 embed = discord.Embed(title="Dragon", description=entityDict["FullName"], color=0x3D85C6)
                 imageLink = info_methods.get_image(entityDict["entityType"], entityDict["Rarity"],

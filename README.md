@@ -1,5 +1,5 @@
 # estelle-bot
-This is a bot for my Discord server.
+Estelle-bot allows for users to quickly search up information about adventurers and dragons from the game Dragalia Lost.
 
 # Commands
 - ?commands - Displays a list of available commands.
@@ -13,15 +13,7 @@ This is a bot for my Discord server.
 - requests
 
 # Examples
-![?info AdventurerName](https://imgur.com/a/eV68YPJ)
-
-# Things I learned doing this project
-- How to interpret robots.txt
-- Read robots.txt before you write a bot/scraper
-- Use the website's API to request the data you want from a Wiki
-- Querying API is tough
-- There's no such thing as free hosting
-- How to scrape from HTML
+![?info AdventurerName](https://i.imgur.com/2fDRoSW.png)
 
 # To-do
 - ?info - Add co-ability information

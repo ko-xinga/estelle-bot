@@ -7,6 +7,7 @@ FLORAL_CIRCLET = "3"
 COMPELLING_BOOK = "4"
 MANA_ESSENCE = "5"
 
+
 def make_dict(entityName):
     """
     Retrieves table content from entity page and puts it in a dict.
@@ -19,13 +20,12 @@ def make_dict(entityName):
 
     rawTable = soup.find("table", {"class": "wikitable mw-page-info"})
     entityDict = {}
-    # for each tr tag...
+    # turn table containing entity info into a dictionary
     for trTag in rawTable.find_all("tr"):
-        # find all td tags (two exactly)
         tdTags = trTag.find_all("td")
-        # first column = key; second = value
         entityDict[tdTags[0].string] = tdTags[1].string
 
+    # determine if entity is an adventurer or dragon
     spanTag = soup.find("span", {"class": "mw-headline"})
     if "adventurer" in spanTag.text.lower():
         entityDict["entityType"] = "adventurer"
@@ -42,7 +42,7 @@ def get_image(entityType, rarity, entityID, variation):
     :param rarity: integer representing the rarity of the entity
     :param entityID: integer representing the ID of the entity
     :param variation: integer representing if the entity requested is an original or themed variation
-    :return: url of the entity's thumbnail
+    :return: string containing url of the entity's thumbnail
     """
     if entityType == "adventurer":
         response = requests.get(f"https://dragalialost.gamepedia.com/File:{entityID}_0{variation}_r0{rarity}.png")
@@ -53,6 +53,7 @@ def get_image(entityType, rarity, entityID, variation):
         return link
 
     elif entityType == "dragon":
+        # dragons can't be promoted unlike adventurers
         response = requests.get(f"https://dragalialost.gamepedia.com/File:{entityID}_0{variation}.png")
         html = response.text
         soup = BeautifulSoup(html, "html.parser")
@@ -76,15 +77,20 @@ def get_skill(entityType, skillName, maxSkillLevel):
     html = response.text
     soup = BeautifulSoup(html, "html.parser")
 
+    # look for columns containing the skill descriptions and extract them
     rawTable = soup.find_all("tr")
     for trTag in rawTable:
         tdTags = trTag.find_all("td")
+        # if its the first skill, get the description from the Description3 field
         if tdTags[0].string == "Description3" and tdTags[0].string == maxSkillLevel:
             skillDescription = tdTags[1].get_text()
+        # if its the second skill, get the description from the Description2 field
         elif tdTags[0].string == "Description2" and tdTags[0].string == maxSkillLevel:
             skillDescription = tdTags[1].get_text()
         if tdTags[0].string == "Sp":
             skillCost = tdTags[1].get_text()
+
+    # concatenate SP cost to adventurer skills (dragons don't have SP values)
     if entityType == "adventurer":
         skillDescription = skillDescription.rstrip() + " [" + skillCost + " SP]"
 
