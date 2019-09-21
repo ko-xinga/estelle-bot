@@ -53,7 +53,7 @@ async def info(ctx, *, arg: str):
         else:
             if entityDict["type"] == ADVENTURER:
                 name = entityDict["name"].replace(" ", "_")
-                embed = discord.Embed(title="Adventurer", description=name, color=0x3D85C6)
+                embed = discord.Embed(title="Adventurer", description=entityDict["name"], color=0x3D85C6)
                 icon = discord.File(f"./adventurers/{name}.png", filename=f"{name}.png")
                 embed.set_thumbnail(url=f"attachment://{name}.png")
 
@@ -69,7 +69,7 @@ async def info(ctx, *, arg: str):
 
             elif entityDict["type"] == DRAGON:
                 name = entityDict["name"].replace(" ", "_")
-                embed = discord.Embed(title="Dragon", description=name, color=0x3D85C6)
+                embed = discord.Embed(title="Dragon", description=entityDict["name"], color=0x3D85C6)
                 icon = discord.File(f"./dragons/{name}.png", filename=f"{name}.png")
                 embed.set_thumbnail(url=f"attachment://{name}.png")
 
@@ -81,7 +81,6 @@ async def info(ctx, *, arg: str):
                 await ctx.send(file=icon, embed=embed)
     else:
         await ctx.send(f"'{entity}' is not a valid name.")
-
 
 
 @bot.command()
