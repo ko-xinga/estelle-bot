@@ -1,5 +1,4 @@
-import requests
-from bs4 import BeautifulSoup
+import sqlite3
 
 JUICY_MEAT = "1"
 KALEIDOSCOPE = "2"
@@ -10,91 +9,37 @@ MANA_ESSENCE = "5"
 
 def make_dict(entityName):
     """
-    Retrieves table content from entity page and puts it in a dict.
+    Retrieves table content and puts it in a dict.
     :param entityName: string entered in by user containing entity name
-    :return: dict containing entity info
+    :return: dict containing entity info, otherwise return None
     """
-    response = requests.get(f"https://dragalialost.gamepedia.com/index.php?title={entityName.title()}&action=pagevalues")
-    html = response.text
-    soup = BeautifulSoup(html, "html.parser")
+    connection = sqlite3.connect("dragalia.db")
+    connection.row_factory = sqlite3.Row
+    cursorObj = connection.cursor()
 
-    rawTable = soup.find("table", {"class": "wikitable mw-page-info"})
-    entityDict = {}
-    # turn table containing entity info into a dictionary
-    for trTag in rawTable.find_all("tr"):
-        tdTags = trTag.find_all("td")
-        entityDict[tdTags[0].string] = tdTags[1].string
+    # check if the entity is an adventurer
+    cursorObj.execute("SELECT name FROM Adventurers WHERE name = ?", (entityName,))
+    query = cursorObj.fetchone()
+    if query is None:
+        # check if the entity is a dragon
+        cursorObj.execute("SELECT name FROM Dragons WHERE name = ?", (entityName,))
+        query = cursorObj.fetchone()
+        if query is None:
+            return None
+        else:
+            cursorObj.execute("SELECT * FROM Dragons WHERE name=?", (entityName,))
+            result = [dict(row) for row in cursorObj.fetchall()]
+            entityDict = result[0]
+            entityDict["type"] = "dragon"
+    else:
+        cursorObj.execute("SELECT * FROM Adventurers WHERE name=?", (entityName,))
+        result = [dict(row) for row in cursorObj.fetchall()]
+        entityDict = result[0]
+        entityDict["type"] = "adventurer"
 
-    # determine if entity is an adventurer or dragon
-    spanTag = soup.find("span", {"class": "mw-headline"})
-    if "adventurer" in spanTag.text.lower():
-        entityDict["entityType"] = "adventurer"
-    elif "dragon" in spanTag.text.lower():
-        entityDict["entityType"] = "dragon"
+    connection.close()
 
     return entityDict
-
-
-def get_image(entityType, rarity, entityID, variation):
-    """
-    Retrieves thumbnail of entity.
-    :param entityType: string representing if the entity is an adventurer or dragon
-    :param rarity: integer representing the rarity of the entity
-    :param entityID: integer representing the ID of the entity
-    :param variation: integer representing if the entity requested is an original or themed variation
-    :return: string containing url of the entity's thumbnail
-    """
-    if entityType == "adventurer":
-        response = requests.get(f"https://dragalialost.gamepedia.com/File:{entityID}_0{variation}_r0{rarity}.png")
-        html = response.text
-        soup = BeautifulSoup(html, "html.parser")
-        div = soup.find("div", {"class": "fullImageLink"})
-        link = div.find("a")["href"]
-        return link
-
-    elif entityType == "dragon":
-        # dragons can't be promoted unlike adventurers
-        response = requests.get(f"https://dragalialost.gamepedia.com/File:{entityID}_0{variation}.png")
-        html = response.text
-        soup = BeautifulSoup(html, "html.parser")
-        div = soup.find("div", {"class": "fullImageLink"})
-        link = div.find("a")["href"]
-        return link
-
-
-def get_skill(entityType, skillName, maxSkillLevel):
-    """
-    Retrieves skill description.
-    :param entityType: string representing if the entity is an adventurer or dragon
-    :param skillName: string representing skill name
-    :param maxSkillLevel: string representing highest level the skill can become
-    :return: string containing the concatenated description
-    """
-    skillDescription = ""
-    skillCost = ""
-    urlPart = skillName.replace(" ", "_")
-    response = requests.get(f"https://dragalialost.gamepedia.com/index.php?title={urlPart}&action=pagevalues")
-    html = response.text
-    soup = BeautifulSoup(html, "html.parser")
-
-    # look for columns containing the skill descriptions and extract them
-    rawTable = soup.find_all("tr")
-    for trTag in rawTable:
-        tdTags = trTag.find_all("td")
-        # if its the first skill, get the description from the Description3 field
-        if tdTags[0].string == "Description3" and tdTags[0].string == maxSkillLevel:
-            skillDescription = tdTags[1].get_text()
-        # if its the second skill, get the description from the Description2 field
-        elif tdTags[0].string == "Description2" and tdTags[0].string == maxSkillLevel:
-            skillDescription = tdTags[1].get_text()
-        if tdTags[0].string == "Sp":
-            skillCost = tdTags[1].get_text()
-
-    # concatenate SP cost to adventurer skills (dragons don't have SP values)
-    if entityType == "adventurer":
-        skillDescription = skillDescription.rstrip() + " [" + skillCost + " SP]"
-
-    return skillDescription
 
 
 def get_footer(entityDict):
@@ -128,11 +73,28 @@ def get_favorite(gift):
         return "Mana Essence (Friday)"
 
 
-def pretty_print(skillName, description):
+def print_skills(skillName, description):
     """
     Formats the skill and its description so they can be embedded into Discord.
     :param skillName: string representing skill name
     :param description: string representing lengthy skill description
     :return: formatted string
     """
-    return "**" + skillName + "**: " + description
+    prettyString = "**" + skillName + "**: " + description.replace("\n", "")
+    return prettyString
+
+
+def print_abilities(abilityList):
+    """
+    Formats the abilities so they can be embedded into Discord.
+    :param abilityList: list containing all the abilities
+    :return: formatted string
+    """
+    prettyString = ""
+    for ability in abilityList:
+        if ability != abilityList[-1]:
+            prettyString = prettyString + ability + "\n"
+        else:
+            prettyString += ability
+
+    return prettyString

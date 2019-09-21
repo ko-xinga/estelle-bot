@@ -7,8 +7,9 @@ Estelle-bot allows for users to quickly search up information about adventurers 
 - ?notte - Prints a fun message.
 
 # Requirements
-- Python 3.7
+- Python 3.7+
 - discord.py (rewrite) 1.2.3
+- sqlite3
 - beautifulsoup4
 - requests
 
@@ -16,5 +17,6 @@ Estelle-bot allows for users to quickly search up information about adventurers 
 ![?info AdventurerName](https://i.imgur.com/2fDRoSW.png)
 
 # To-do
-- ?info - Add co-ability information
-- ?info - Add passive ability information
+- ?info - Add each dragon's favorite gift,
+- [NEW COMMAND] ?monster - Report HP, resistances, etc. about a monster.
+- [NEW COMMAND] ?randomizer - Fun thing to do with your alliance. Randomizes adventurers to fight High Midgardsormr.
