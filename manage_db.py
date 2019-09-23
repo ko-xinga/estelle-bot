@@ -111,7 +111,8 @@ def update_adventurers(cursorObj):
                 if "Icon Type Row" in image["alt"]:
                     adventurerList[3] = get_adventurer_class(image["alt"])
 
-        insert_adventurers(cursorObj, adventurerList)
+        if None not in adventurerList and "None" not in adventurerList:
+            insert_adventurers(cursorObj, adventurerList)
         adventurerList = []
 
 
@@ -135,29 +136,35 @@ def update_dragons(cursorObj):
             value = column.text.strip()
             dragonList.append(value)
 
-            # get id of dragon
+            # get id of dragon, which is on the image at column 0
             if len(columns) != 0 and column == columns[0]:
                 imageTag = column.find('img', alt=True)
-                imageList = imageTag['alt'].split()
-                # replace blank index with id
-                dragonList[0] = imageList[0] + "_" + imageList[1].replace(".png", "")
+                # check if image exists before attempting to scrape id
+                try:
+                    imageList = imageTag['alt'].split()
+                except TypeError:
+                    dragonList[0] = ""
+                else:
+                    # replace blank index with id
+                    dragonList[0] = imageList[0] + "_" + imageList[1].replace(".png", "")
 
-            # get the name of the first ability manually
-            if len(columns) != 0 and column == columns[-3]:
+            # get the name of the first ability manually which is at column 7
+            if len(columns) != 0 and column == columns[7]:
                 title = column.find_all("a")
                 try:
                     dragonList[7] = title[-1].text
                 except IndexError:
                     dragonList[7] = ""
-            # get the name of the second ability manually
-            elif len(columns) != 0 and column == columns[-2]:
+            # get the name of the second ability manually which is at column 8
+            elif len(columns) != 0 and column == columns[8]:
                 title = column.find_all("a")
                 try:
                     dragonList[8] = title[-1].text
                 except IndexError:
                     dragonList[8] = ""
 
-        insert_dragons(cursorObj, dragonList)
+        if None not in dragonList and "None" not in dragonList:
+            insert_dragons(cursorObj, dragonList)
         dragonList = []
 
 
@@ -223,15 +230,19 @@ def separate_skill_desc(skillBlock):
     :param skillBlock: string containing all the skill info concatenated together
     :return: two strings (skill name and skill description)
     """
-    # split skill description until we get the final level of the skill
-    stringListOne = skillBlock.split("Lv. 1: ")
-    stringListTwo = stringListOne[1].split("Lv. 2:")
-    stringListThree = stringListTwo[1].split("Lv. 3:")
+    skill = ""
+    skillDesc = ""
 
-    skill = stringListOne[0].strip()
-    skillDesc = stringListThree[-1].strip()
-
-    return skill, skillDesc
+    if len(skillBlock) > 0:
+        # split skill description until we get the final level of the skill
+        stringListOne = skillBlock.split("Lv. 1: ")
+        stringListTwo = stringListOne[1].split("Lv. 2:")
+        stringListThree = stringListTwo[1].split("Lv. 3:")
+        skill = stringListOne[0].strip()
+        skillDesc = stringListThree[-1].strip()
+        return skill, skillDesc
+    else:
+        return skill, skillDesc
 
 
 def get_adventurer_class(tag):
