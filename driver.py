@@ -16,12 +16,6 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("Dragalia Lost"))
 
 
-@bot.event
-async def on_command_error(error, ctx):
-    print(ctx)
-
-
-
 @bot.command()
 async def commands(ctx):
     """
