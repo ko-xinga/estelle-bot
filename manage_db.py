@@ -198,7 +198,6 @@ def download_images(cursorObj):
             except AttributeError:
                 print(f"Error: Unable to download ID {idList[0]} variation {idList[1]}")
             else:
-                print(f"Downloading {name}'s image...")
                 urlreq.urlretrieve(link, f"./adventurers/{name}.png")
 
     # retrieve all dragon images
@@ -220,7 +219,6 @@ def download_images(cursorObj):
             except AttributeError:
                 print(f"Error: Unable to download ID {idList[0]} variation {idList[1]}")
             else:
-                print(f"Downloading {name}'s image...")
                 urlreq.urlretrieve(link, f"./dragons/{name}.png")
 
 

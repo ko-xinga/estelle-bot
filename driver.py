@@ -42,7 +42,7 @@ async def info(ctx, *, arg: str):
     :param arg: String entered in by user containing entity name
     :return: None
     """
-    entity = arg
+    entity = arg.title()
     wordCount = entity.split()
     
     if len(wordCount) < 3:
