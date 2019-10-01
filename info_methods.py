@@ -1,11 +1,7 @@
 import sqlite3
 
-JUICY_MEAT = "1"
-KALEIDOSCOPE = "2"
-FLORAL_CIRCLET = "3"
-COMPELLING_BOOK = "4"
-MANA_ESSENCE = "5"
-
+ADVENTURER = "adventurer"
+DRAGON = "dragon"
 
 def make_dict(entityName):
     """
@@ -55,32 +51,23 @@ def get_footer(entityDict):
         return entityDict["Rarity"] + "* | " + entityDict["ElementalType"]
 
 
-def get_favorite(gift):
-    """
-    Returns the dragon's favorite roost item.
-    :param gift: string representing a value of which roost item is preferred by the dragon
-    :return: string containing hard-coded value
-    """
-    if gift == JUICY_MEAT:
-        return "Juicy Meat (Monday)"
-    if gift == KALEIDOSCOPE:
-        return "Kaleidoscope (Tuesday)"
-    if gift == FLORAL_CIRCLET:
-        return "Floral Circlet (Wednesday)"
-    if gift == COMPELLING_BOOK:
-        return "Compelling Book (Thursday)"
-    if gift == MANA_ESSENCE:
-        return "Mana Essence (Friday)"
-
-
-def print_skills(skillName, description):
+def print_skills(skillName, description, type):
     """
     Formats the skill and its description so they can be embedded into Discord.
     :param skillName: string representing skill name
     :param description: string representing lengthy skill description
     :return: formatted string
     """
-    prettyString = "**" + skillName + "**: " + description.replace("\n", "")
+    prettyString = ""
+
+    if type == ADVENTURER:
+        prettyString = "**" + skillName + "**: " + description.replace("\n", "")
+    elif type == DRAGON:
+        prettyString = "**" + skillName + "**: " + description.replace("\n", "")
+        # remove sp cost
+        prettyString = prettyString.split(" [")
+        prettyString = prettyString[0]
+
     return prettyString
 
 
@@ -91,6 +78,7 @@ def print_abilities(abilityList):
     :return: formatted string
     """
     prettyString = ""
+
     for ability in abilityList:
         if ability != abilityList[-1]:
             prettyString = prettyString + ability + "\n"

@@ -51,8 +51,10 @@ async def info(ctx, *, arg: str):
                 icon = discord.File(f"./adventurers/{name}.png", filename=f"{name}.png")
                 embed.set_thumbnail(url=f"attachment://{name}.png")
 
-                skillOneDescription = info_methods.print_skills(entityDict["skill_one"], entityDict["skill_one_desc"])
-                skillTwoDescription = info_methods.print_skills(entityDict["skill_two"], entityDict["skill_two_desc"])
+                skillOneDescription = info_methods.print_skills(entityDict["skill_one"], entityDict["skill_one_desc"],
+                                                                ADVENTURER)
+                skillTwoDescription = info_methods.print_skills(entityDict["skill_two"], entityDict["skill_two_desc"],
+                                                                ADVENTURER)
                 abilities = info_methods.print_abilities([entityDict["ability_one"], entityDict["ability_two"],
                                                          entityDict["ability_three"]])
 
@@ -67,7 +69,8 @@ async def info(ctx, *, arg: str):
                 icon = discord.File(f"./dragons/{name}.png", filename=f"{name}.png")
                 embed.set_thumbnail(url=f"attachment://{name}.png")
 
-                skillOneDescription = info_methods.print_skills(entityDict["skill_one"], entityDict["skill_one_desc"])
+                skillOneDescription = info_methods.print_skills(entityDict["skill_one"], entityDict["skill_one_desc"],
+                                                                DRAGON)
                 abilities = info_methods.print_abilities([entityDict["ability_one"], entityDict["ability_two"]])
 
                 embed.add_field(name="Skills", value=skillOneDescription, inline=False)

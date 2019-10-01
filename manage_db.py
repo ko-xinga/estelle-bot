@@ -155,11 +155,17 @@ def update_dragons(cursorObj):
                     dragonList[7] = title[-1].text
                 except IndexError:
                     dragonList[7] = ""
+
             # get the name of the second ability manually which is at column 8
             elif len(columns) != 0 and column == columns[8]:
                 title = column.find_all("a")
+
                 try:
-                    dragonList[8] = title[-1].text
+                    # scrape weird formatting of wiki table
+                    if len(title[-2].text) > 0:
+                        dragonList[8] = title[-2].text
+                    else:
+                        dragonList[8] = title[-1].text
                 except IndexError:
                     dragonList[8] = ""
 

@@ -17,6 +17,5 @@ Estelle-bot allows for users to quickly search up information about adventurers 
 ![?info AdventurerName](https://i.imgur.com/2fDRoSW.png)
 
 # To-do
-- ?info - Add each dragon's favorite gift,
+- ?info - Add each dragon's favorite gift
 - [NEW COMMAND] ?monster - Report HP, resistances, etc. about a monster.
-- [NEW COMMAND] ?randomizer - Fun thing to do with your alliance. Randomizes adventurers to fight High Midgardsormr.
