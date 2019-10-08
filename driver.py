@@ -1,4 +1,5 @@
 import discord
+import sqlite3
 from dtoken import TOKEN
 from discord.ext import commands
 import info_methods
@@ -12,7 +13,7 @@ bot = commands.Bot(command_prefix="?")
 
 @bot.event
 async def on_ready():
-    print("I might be in a bathing suit, but I can, and will, continue to maintain order.")
+    print("Estelle-bot is now running.")
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("Dragalia Lost"))
 
 
@@ -40,11 +41,16 @@ async def info(ctx, *, arg: str):
     wordCount = entity.split()
     
     if len(wordCount) < 3:
-        # check if adventurer or dragon exists first
         entityDict = info_methods.make_dict(entity)
+
+        # check if adventurer or dragon exists first
         if entityDict is None:
-            await ctx.send(f"'{entity}' does not exist (or you may have misspelled their name).")
+            alternativeNames = info_methods.find_alternatives(entity)
+            prettyString = info_methods.print_alternatives(alternativeNames)
+            await ctx.send(f"'{entity}' does not exist in my database (or you may have misspelled their name). "
+                           f"{prettyString}")
         else:
+            # entity is an adventurer
             if entityDict["type"] == ADVENTURER:
                 name = entityDict["name"].replace(" ", "_")
                 emojiString = info_methods.get_adv_emojis(entityDict["rarity"], entityDict["element"],
@@ -66,6 +72,7 @@ async def info(ctx, *, arg: str):
                 embed.add_field(name="Co-ability", value=entityDict["co_ability"], inline=False)
                 await ctx.send(file=icon, embed=embed)
 
+            # entity is a dragon
             elif entityDict["type"] == DRAGON:
                 name = entityDict["name"].replace(" ", "_")
                 emojiString = info_methods.get_dragon_emojis(entityDict["rarity"], entityDict["element"])
@@ -82,6 +89,7 @@ async def info(ctx, *, arg: str):
                 await ctx.send(file=icon, embed=embed)
     else:
         await ctx.send(f"'{entity}' is not a valid name.")
+
 
 
 @bot.command()

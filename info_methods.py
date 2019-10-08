@@ -64,8 +64,46 @@ def make_dict(entityName):
     return entityDict
 
 
-def get_adv_emojis(rarity, element, weapon, advClass):
+def find_alternatives(entityName):
+    """
+    Find possible adventurers or dragons if the original entry cannot be found.
+    :param entityName: string entered in by user containing entity name
+    :return: list containing all possible entities
+    """
+    possibleList = []
+    connection = sqlite3.connect("dragalia.db")
+    cursorObj = connection.cursor()
+    cursorObj.execute("SELECT name FROM Adventurers")
+    adventurerList = [job[0] for job in cursorObj.execute("SELECT name FROM Adventurers")]
+    cursorObj.execute("SELECT name FROM Dragons")
+    dragonList = [job[0] for job in cursorObj.execute("SELECT name FROM Dragons")]
 
+    # clear up common naming error
+    if entityName == "Gala Euden":
+        possibleList.append("Gala Prince")
+    # look for possible names
+    if len(entityName) > 1:
+        for adventurerName in adventurerList:
+            if entityName in adventurerName:
+                possibleList.append(adventurerName)
+        for dragonName in dragonList:
+            if entityName in dragonName:
+                possibleList.append(dragonName)
+
+    connection.close()
+
+    return possibleList
+
+
+def get_adv_emojis(rarity, element, weapon, advClass):
+    """
+    Return emoji ID of rarity, element, weapon, and class icons for the adventurer embed.
+    :param rarity: string representing entity rarity
+    :param element: string representing entity element
+    :param weapon: string representing entity weapon
+    :param advClass: string representing entity class
+    :return: formatted string
+    """
     rarityEmoji = ""
     elementEmoji = ""
     weaponEmoji = ""
@@ -121,7 +159,12 @@ def get_adv_emojis(rarity, element, weapon, advClass):
 
 
 def get_dragon_emojis(rarity, element):
-
+    """
+    Return emoji ID of rarity and element icons for the dragon embed.
+    :param rarity: string representing entity rarity
+    :param element: string representing entity element
+    :return: formatted string
+    """
     rarityEmoji = ""
     elementEmoji = ""
 
@@ -183,3 +226,22 @@ def print_abilities(abilityList):
             prettyString += ability
 
     return prettyString
+
+
+def print_alternatives(nameList):
+    """
+    Formats the possible names so they can be embedded into Discord.
+    :param nameList: list containing all the names
+    :return: formatted string
+    """
+    prettyString = ""
+    if len(nameList) != 0:
+        prettyString = "\nDid you mean...\n"
+        for name in nameList:
+            if name != nameList[-1]:
+                prettyString = prettyString + "- " + name + "\n"
+            else:
+                prettyString = prettyString + "- " + name
+        return prettyString
+    else:
+        return prettyString
