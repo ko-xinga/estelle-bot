@@ -14,7 +14,7 @@ Estelle-bot allows for users to quickly search up information about adventurers 
 - requests
 
 # Examples
-![?info AdventurerName](https://i.imgur.com/2fDRoSW.png)
+![?info AdventurerName](https://i.imgur.com/19Bi4IE.png)
 
 # To-do
 - ?info - Add each dragon's favorite gift

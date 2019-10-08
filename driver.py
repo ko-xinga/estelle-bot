@@ -42,12 +42,14 @@ async def info(ctx, *, arg: str):
     if len(wordCount) < 3:
         # check if adventurer or dragon exists first
         entityDict = info_methods.make_dict(entity)
-        if entity is None:
+        if entityDict is None:
             await ctx.send(f"'{entity}' does not exist (or you may have misspelled their name).")
         else:
             if entityDict["type"] == ADVENTURER:
                 name = entityDict["name"].replace(" ", "_")
-                embed = discord.Embed(title="Adventurer", description=entityDict["name"], color=0x3D85C6)
+                emojiString = info_methods.get_adv_emojis(entityDict["rarity"], entityDict["element"],
+                                                          entityDict["weapon"], entityDict["class"])
+                embed = discord.Embed(title=entityDict["name"], description=emojiString, color=0x3D85C6)
                 icon = discord.File(f"./adventurers/{name}.png", filename=f"{name}.png")
                 embed.set_thumbnail(url=f"attachment://{name}.png")
 
@@ -58,14 +60,16 @@ async def info(ctx, *, arg: str):
                 abilities = info_methods.print_abilities([entityDict["ability_one"], entityDict["ability_two"],
                                                          entityDict["ability_three"]])
 
-                embed.add_field(name="Skills", value=skillOneDescription + "\n\n" + skillTwoDescription, inline=False)
+                embed.add_field(name="Skill 1", value=skillOneDescription, inline=False)
+                embed.add_field(name="Skill 2", value=skillTwoDescription, inline=False)
                 embed.add_field(name="Abilities", value=abilities, inline=False)
                 embed.add_field(name="Co-ability", value=entityDict["co_ability"], inline=False)
                 await ctx.send(file=icon, embed=embed)
 
             elif entityDict["type"] == DRAGON:
                 name = entityDict["name"].replace(" ", "_")
-                embed = discord.Embed(title="Dragon", description=entityDict["name"], color=0x3D85C6)
+                emojiString = info_methods.get_dragon_emojis(entityDict["rarity"], entityDict["element"])
+                embed = discord.Embed(title=entityDict["name"], description=emojiString, color=0x3D85C6)
                 icon = discord.File(f"./dragons/{name}.png", filename=f"{name}.png")
                 embed.set_thumbnail(url=f"attachment://{name}.png")
 
@@ -73,7 +77,7 @@ async def info(ctx, *, arg: str):
                                                                 DRAGON)
                 abilities = info_methods.print_abilities([entityDict["ability_one"], entityDict["ability_two"]])
 
-                embed.add_field(name="Skills", value=skillOneDescription, inline=False)
+                embed.add_field(name="Skill", value=skillOneDescription, inline=False)
                 embed.add_field(name="Abilities", value=abilities, inline=False)
                 await ctx.send(file=icon, embed=embed)
     else:
