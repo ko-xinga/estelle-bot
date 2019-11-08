@@ -1,3 +1,4 @@
 ?commands - Displays a list of available commands. You just used this one. ;)
 ?info - Retrieves information about the adventurer/dragon and prints it to the Discord text channel.
+?findwp - Retrieves all wyrmprints that contain requested ability.
 ?notte - Prints a fun message.

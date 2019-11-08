@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 ADVENTURER_URL = "https://dragalialost.gamepedia.com/Adventurer_Detailed_List"
 DRAGON_URL = "https://dragalialost.gamepedia.com/Dragon_List"
+WYRMPRINT_URL = "https://dragalialost.gamepedia.com/Wyrmprint_List"
 
 ADVENTURER = "adventurer"
 DRAGON = "dragon"
@@ -51,6 +52,16 @@ CREATE TABLE Dragons (
 );
 """
 
+INITIALIZE_WYRMPRINTS_COMMAND = """
+CREATE TABLE Wyrmprints (
+    name TEXT PRIMARY KEY,
+    rarity TEXT,
+    ability_one TEXT,
+    ability_two TEXT,
+    ability_three TEXT
+);
+"""
+
 
 def initialize_adventurers(cursorObj):
     """
@@ -75,6 +86,19 @@ def initialize_dragons(cursorObj):
         cursorObj.execute(INITIALIZE_DRAGONS_COMMAND)
     except sqlite3.OperationalError as error:
         print(f"From initialize_dragons():\n\tDatabase Error: {error}")
+        return error
+
+
+def initialize_wyrmprints(cursorObj):
+    """
+    Creates Wyrmprints table.
+    :param cursorObj: cursor pointing to sqlite database
+    :return: error
+    """
+    try:
+        cursorObj.execute(INITIALIZE_WYRMPRINTS_COMMAND)
+    except sqlite3.OperationalError as error:
+        print(f"From initialize_wyrmprints():\n\tDatabase Error: {error}")
         return error
 
 
@@ -129,7 +153,7 @@ def update_dragons(cursorObj):
 
     dragonList = []
 
-    # create a list containing all the information about the adventurer
+    # create a list containing all the information about the dragon
     for row in rawTable.find_all("tr"):
         columns = row.find_all("td")
         for column in columns:
@@ -172,6 +196,63 @@ def update_dragons(cursorObj):
         if None not in dragonList and "None" not in dragonList:
             insert_dragons(cursorObj, dragonList)
         dragonList = []
+
+
+def update_wyrmprints(cursorObj):
+    """
+    Scrape wiki and update the Wyrmprints table.
+    :param cursorObj: cursor pointing to sqlite database
+    :return: none
+    """
+    response = requests.get(WYRMPRINT_URL)
+    html = response.text
+    soup = BeautifulSoup(html, "html.parser")
+    rawTable = soup.find("table", {"class": "wikitable"})
+
+    wyrmprintList = []
+
+    # create a list containing all the information about the wyrmprint
+    for row in rawTable.find_all("tr"):
+        columns = row.find_all("td")
+        for column in columns:
+            # get value at current column
+            value = column.text.strip()
+
+            # get the name of the wyrmprint and append it
+            if len(columns) != 0 and column == columns[1]:
+                wyrmprintList.append(value)
+
+            # get the rarity of the wyrmprint
+            if len(columns) != 0 and column == columns[2]:
+                wyrmprintList.append(value)
+
+            # get the name of the first ability manually
+            if len(columns) != 0 and column == columns[5]:
+                title = column.find_all("a")
+                try:
+                    wyrmprintList.append(title[-1].text)
+                except IndexError:
+                    wyrmprintList.append("")
+
+            # get the name of the second ability manually
+            if len(columns) != 0 and column == columns[6]:
+                title = column.find_all("a")
+                try:
+                    wyrmprintList.append(title[-1].text)
+                except IndexError:
+                    wyrmprintList.append("")
+
+            # get the name of the third ability manually
+            if len(columns) != 0 and column == columns[7]:
+                title = column.find_all("a")
+                try:
+                    wyrmprintList.append(title[-1].text)
+                except IndexError:
+                    wyrmprintList.append("")
+
+        if None not in wyrmprintList and "None" not in wyrmprintList:
+            insert_wyrmprints(cursorObj, wyrmprintList)
+        wyrmprintList = []
 
 
 def download_images(cursorObj):
@@ -318,16 +399,37 @@ def insert_dragons(cursorObj, row):
             print(f"From insert_dragons():\n\tDatabase Error: {error}")
 
 
+def insert_wyrmprints(cursorObj, row):
+    """
+    Inserts wyrmprint info into table.
+    :param cursorObj: cursor pointing to sqlite database
+    :param row: list containing information about wyrmprint
+    :return: none
+    """
+    sql = '''REPLACE INTO Wyrmprints
+                    (name, rarity, ability_one, ability_two, ability_three) 
+                VALUES
+                    (?,?,?,?,?);
+        '''
+    if len(row) != 0:
+        try:
+            cursorObj.execute(sql, (row[0], row[1], row[2], row[3], row[4],))
+        except sqlite3.IntegrityError as error:
+            print(f"From insert_wyrmprints():\n\tDatabase Error: {error}")
+
+
 def main():
     connection = sqlite3.connect("dragalia.db")
     cursorObj = connection.cursor()
 
     initialize_adventurers(cursorObj)
     initialize_dragons(cursorObj)
+    initialize_wyrmprints(cursorObj)
 
     print("Now updating database...")
     update_adventurers(cursorObj)
     update_dragons(cursorObj)
+    update_wyrmprints(cursorObj)
 
     print("Now downloading images...")
     download_images(cursorObj)

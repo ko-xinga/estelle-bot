@@ -3,6 +3,7 @@ import sqlite3
 from dtoken import TOKEN
 from discord.ext import commands
 import info_methods
+import findwp_methods
 
 ADVENTURER = "adventurer"
 DRAGON = "dragon"
@@ -90,6 +91,40 @@ async def info(ctx, *, arg: str):
     else:
         await ctx.send(f"'{entity}' is not a valid name.")
 
+
+@bot.command()
+async def findwp(ctx, *, arg: str):
+    """
+    Retrieves information about wyrmprints that might have a requested ability
+    and prints it to the Discord text channel.
+    :param ctx: Context command was issued
+    :param arg: String entered in by user containing search parameters
+    :return:
+    """
+    RARITY_FIVE = "<:rar_5:630906532179214338>"
+    RARITY_FOUR = "<:rar_4:630906532187340810>"
+    RARITY_THREE = "<:rar_3:630906532199923722>"
+
+    ability = arg
+
+    if len(ability) < 4:
+        await ctx.send("Please enter a longer search parameter.")
+    else:
+        # get list of wyrmprints (dictionaries)
+        wyrmprintList = findwp_methods.make_list(ability)
+        embedTitle = f"Search Result for Wyrmprints Containing: '{ability}'"
+        embed = discord.Embed(title=embedTitle, color=0x3D85C6)
+
+        for wyrmprint in wyrmprintList:
+            description = findwp_methods.pretty_print(wyrmprint)
+            if wyrmprint["rarity"] == "5":
+                embed.add_field(name=RARITY_FIVE + " " + wyrmprint["name"], value=description, inline=False)
+            if wyrmprint["rarity"] == "4":
+                embed.add_field(name=RARITY_FOUR + " " + wyrmprint["name"], value=description, inline=False)
+            if wyrmprint["rarity"] == "3":
+                embed.add_field(name=RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
+
+        await ctx.send(embed=embed)
 
 
 @bot.command()

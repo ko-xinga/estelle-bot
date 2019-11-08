@@ -51,6 +51,7 @@ def make_dict(entityName):
         else:
             cursorObj.execute("SELECT * FROM Dragons WHERE name=?", (entityName,))
             result = [dict(row) for row in cursorObj.fetchall()]
+            # get dict
             entityDict = result[0]
             entityDict["type"] = "dragon"
     else:
