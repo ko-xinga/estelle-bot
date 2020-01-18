@@ -34,7 +34,8 @@ CREATE TABLE Adventurers (
     ability_two TEXT,
     ability_three TEXT,
     release_date TEXT,
-    obtain_method TEXT
+    obtain_method TEXT,
+    mana_spiral TEXT
 );
 """
 
@@ -323,9 +324,17 @@ def separate_skill_desc(skillBlock):
         stringListOne = skillBlock.split("Lv. 1: ")
         stringListTwo = stringListOne[1].split("Lv. 2:")
         stringListThree = stringListTwo[1].split("Lv. 3:")
-        skill = stringListOne[0].strip()
-        skillDesc = stringListThree[-1].strip()
-        return skill, skillDesc
+        try:
+            stringListFour = stringListThree[1].split("Lv. 4:")
+        except IndexError:
+            stringListThree = stringListTwo[1].split("Lv. 3:")
+            skill = stringListOne[0].strip()
+            skillDesc = stringListThree[-1].strip()
+            return skill, skillDesc
+        else:
+            skill = stringListOne[0].strip()
+            skillDesc = stringListFour[-1].strip()
+            return skill, skillDesc
     else:
         return skill, skillDesc
 
@@ -357,21 +366,25 @@ def insert_adventurers(cursorObj, row):
                 (id, name, title, class, rarity, 
                 element, weapon, skill_one, skill_one_desc, 
                 skill_two, skill_two_desc, co_ability, ability_one, 
-                ability_two, ability_three, release_date, obtain_method) 
+                ability_two, ability_three, release_date, obtain_method, mana_spiral) 
             VALUES
                 (?,?,?,?,?,
                 ?,?,?,?,
                 ?,?,?,?,
-                ?,?,?,?);
+                ?,?,?,?,?);
     '''
     if len(row) != 0:
         try:
+            if "Lv. 4:" in row[9]:
+                manaSpiral = "yes"
+            else:
+                manaSpiral = "no"
             skillOne, skillOneDesc = separate_skill_desc(row[9])
             skillTwo, skillTwoDesc = separate_skill_desc(row[10])
             cursorObj.execute(sql, (row[0], row[1], row[2], row[3], row[4],
                                     row[5], row[6], skillOne, skillOneDesc,
                                     skillTwo, skillTwoDesc, row[11].replace(" (Co-ability)", ""), row[12],
-                                    row[13], row[14], row[16], row[17],))
+                                    row[13], row[14], row[16], row[17], manaSpiral,))
         except sqlite3.IntegrityError as error:
             print(f"From insert_adventurers():\n\tDatabase Error: {error}")
 

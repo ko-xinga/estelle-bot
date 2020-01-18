@@ -1,9 +1,9 @@
 import discord
-import sqlite3
 from dtoken import TOKEN
 from discord.ext import commands
 import info_methods
 import findwp_methods
+import manaspiral_methods
 
 ADVENTURER = "adventurer"
 DRAGON = "dragon"
@@ -15,7 +15,7 @@ bot = commands.Bot(command_prefix="?")
 @bot.event
 async def on_ready():
     print("Estelle-bot is now running.")
-    await bot.change_presence(status=discord.Status.online, activity=discord.Game("Dragalia Lost"))
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game("?commands"))
 
 
 @bot.command()
@@ -55,7 +55,8 @@ async def info(ctx, *, arg: str):
             if entityDict["type"] == ADVENTURER:
                 name = entityDict["name"].replace(" ", "_")
                 emojiString = info_methods.get_adv_emojis(entityDict["rarity"], entityDict["element"],
-                                                          entityDict["weapon"], entityDict["class"])
+                                                          entityDict["weapon"], entityDict["class"],
+                                                          entityDict["mana_spiral"])
                 embed = discord.Embed(title=entityDict["name"], description=emojiString, color=0x3D85C6)
                 icon = discord.File(f"./adventurers/{name}.png", filename=f"{name}.png")
                 embed.set_thumbnail(url=f"attachment://{name}.png")
@@ -125,6 +126,28 @@ async def findwp(ctx, *, arg: str):
                 embed.add_field(name=RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
 
         await ctx.send(embed=embed)
+
+
+@bot.command()
+async def manaspirals(ctx):
+    """
+    Retrieves a list of adventurers who have obtained a mana spiral.
+    :param ctx: Context command was issued
+    :return:
+    """
+    RARITY_FIVE = "<:rar_5:630906532179214338>"
+    RARITY_FOUR = "<:rar_4:630906532187340810>"
+    RARITY_THREE = "<:rar_3:630906532199923722>"
+
+    adventurerList = manaspiral_methods.make_list()
+    embedTitle = f"List of Adventurers with a Mana Spiral:"
+    embed = discord.Embed(title=embedTitle, color=0x3D85C6)
+
+    embed.add_field(name=RARITY_FIVE + " 5", value=manaspiral_methods.pretty_print(adventurerList, "5"), inline=False)
+    embed.add_field(name=RARITY_FOUR + " 4", value=manaspiral_methods.pretty_print(adventurerList, "4"), inline=False)
+    embed.add_field(name=RARITY_THREE + " 3", value=manaspiral_methods.pretty_print(adventurerList, "3"), inline=False)
+
+    await ctx.send(embed=embed)
 
 
 @bot.command()

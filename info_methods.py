@@ -3,7 +3,7 @@ import sqlite3
 ADVENTURER = "adventurer"
 DRAGON = "dragon"
 
-# replace emoji ID's below
+# replace emoji ID's below; to get the emoji id, put a \ in front of the emoji in discord chat and press enter
 RARITY_FIVE = "<:rar_5:630906532179214338>"
 RARITY_FOUR = "<:rar_4:630906532187340810>"
 RARITY_THREE = "<:rar_3:630906532199923722>"
@@ -27,6 +27,8 @@ CLASS_ATTACK = "<:class_attack:630906532191535134>"
 CLASS_DEFENSE = "<:class_defense:630906532233740298>"
 CLASS_SUPPORT = "<:class_support:630906532242128907>"
 CLASS_HEALING = "<:class_healing:630906532321689600>"
+
+MANA_SPIRAL = "<:mana_spiral:667919282310479894>"
 
 
 def make_dict(entityName):
@@ -96,7 +98,7 @@ def find_alternatives(entityName):
     return possibleList
 
 
-def get_adv_emojis(rarity, element, weapon, advClass):
+def get_adv_emojis(rarity, element, weapon, advClass, manaSpiral):
     """
     Return emoji ID of rarity, element, weapon, and class icons for the adventurer embed.
     :param rarity: string representing entity rarity
@@ -109,6 +111,7 @@ def get_adv_emojis(rarity, element, weapon, advClass):
     elementEmoji = ""
     weaponEmoji = ""
     classEmoji = ""
+    spiralEmoji = ""
 
     if rarity == "5":
         rarityEmoji = RARITY_FIVE
@@ -154,7 +157,10 @@ def get_adv_emojis(rarity, element, weapon, advClass):
     elif advClass == "Healing":
         classEmoji = CLASS_HEALING
 
-    prettyString = rarityEmoji + elementEmoji + weaponEmoji + classEmoji
+    if manaSpiral == "yes":
+        spiralEmoji = MANA_SPIRAL
+
+    prettyString = rarityEmoji + elementEmoji + weaponEmoji + classEmoji + spiralEmoji
 
     return prettyString
 
