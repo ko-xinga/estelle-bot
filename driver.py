@@ -72,6 +72,7 @@ async def info(ctx, *, arg: str):
                 embed.add_field(name="Skill 2", value=skillTwoDescription, inline=False)
                 embed.add_field(name="Abilities", value=abilities, inline=False)
                 embed.add_field(name="Co-ability", value=entityDict["co_ability"], inline=False)
+                embed.set_footer(text="Type ?commands to get a list of available commands.")
                 await ctx.send(file=icon, embed=embed)
 
             # entity is a dragon
@@ -88,6 +89,7 @@ async def info(ctx, *, arg: str):
 
                 embed.add_field(name="Skill", value=skillOneDescription, inline=False)
                 embed.add_field(name="Abilities", value=abilities, inline=False)
+                embed.set_footer(text="Type ?commands to get a list of available commands.")
                 await ctx.send(file=icon, embed=embed)
     else:
         await ctx.send(f"'{entity}' is not a valid name.")
@@ -125,6 +127,8 @@ async def findwp(ctx, *, arg: str):
             if wyrmprint["rarity"] == "3":
                 embed.add_field(name=RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
 
+        embed.set_footer(text="Type ?commands to get a list of available commands.")
+
         await ctx.send(embed=embed)
 
 
@@ -146,6 +150,7 @@ async def manaspirals(ctx):
     embed.add_field(name=RARITY_FIVE + " 5", value=manaspiral_methods.pretty_print(adventurerList, "5"), inline=False)
     embed.add_field(name=RARITY_FOUR + " 4", value=manaspiral_methods.pretty_print(adventurerList, "4"), inline=False)
     embed.add_field(name=RARITY_THREE + " 3", value=manaspiral_methods.pretty_print(adventurerList, "3"), inline=False)
+    embed.set_footer(text="Type ?commands to get a list of available commands.")
 
     await ctx.send(embed=embed)
 
