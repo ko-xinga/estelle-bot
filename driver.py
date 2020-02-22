@@ -72,7 +72,10 @@ async def info(ctx, *, arg: str):
                 embed.add_field(name="Skill 2", value=skillTwoDescription, inline=False)
                 embed.add_field(name="Abilities", value=abilities, inline=False)
                 embed.add_field(name="Co-ability", value=entityDict["co_ability"], inline=False)
-                embed.set_footer(text="Type ?commands to get a list of available commands.")
+
+                obtainMethod = "This adventurer is obtainable via " + entityDict["obtain_method"] + "."
+                footerTip = "\nType ?commands to get a list of available commands."
+                embed.set_footer(text=obtainMethod + footerTip)
                 await ctx.send(file=icon, embed=embed)
 
             # entity is a dragon
