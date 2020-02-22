@@ -322,18 +322,32 @@ def separate_skill_desc(skillBlock):
     if len(skillBlock) > 0:
         # split skill description until we get the final level of the skill
         stringListOne = skillBlock.split("Lv. 1: ")
-        stringListTwo = stringListOne[1].split("Lv. 2:")
-        stringListThree = stringListTwo[1].split("Lv. 3:")
-        try:
-            stringListFour = stringListThree[1].split("Lv. 4:")
-        except IndexError:
-            stringListThree = stringListTwo[1].split("Lv. 3:")
-            skill = stringListOne[0].strip()
-            skillDesc = stringListThree[-1].strip()
-            return skill, skillDesc
+        if "Lv. 2:" in stringListOne[1]:
+            stringListTwo = stringListOne[1].split("Lv. 2:")
+            if "Lv. 3:" in stringListTwo[1]:
+                stringListThree = stringListTwo[1].split("Lv. 3:")
+                try:
+                    stringListFour = stringListThree[1].split("Lv. 4:")
+                # maximum skill level is three
+                except IndexError:
+                    stringListThree = stringListTwo[1].split("Lv. 3:")
+                    skill = stringListOne[0].strip()
+                    skillDesc = stringListThree[-1].strip()
+                    return skill, skillDesc
+                # maximum skill level is four (via mana spiral)
+                else:
+                    skill = stringListOne[0].strip()
+                    skillDesc = stringListFour[-1].strip()
+                    return skill, skillDesc
+            # maximum skill level is two
+            else:
+                skill = stringListOne[0].strip()
+                skillDesc = stringListTwo[-1].strip()
+                return skill, skillDesc
+        # maximum skill level is one
         else:
             skill = stringListOne[0].strip()
-            skillDesc = stringListFour[-1].strip()
+            skillDesc = stringListOne[-1].strip()
             return skill, skillDesc
     else:
         return skill, skillDesc
