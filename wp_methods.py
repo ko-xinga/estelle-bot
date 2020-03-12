@@ -19,7 +19,7 @@ def make_dict(parameter):
         connection.close()
         return None
     else:
-        cursorObj.execute("SELECT * FROM Wyrmprints WHERE name=?", (parameter,))
+        cursorObj.execute("SELECT * FROM Wyrmprints WHERE name= ? COLLATE NOCASE", (parameter,))
         result = [dict(row) for row in cursorObj.fetchall()]
         connection.close()
         wyrmprint = result[0]
