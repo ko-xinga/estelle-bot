@@ -5,6 +5,7 @@ Estelle-bot allows for users to quickly search up information about adventurers 
 - ?commands (or ?help) - Displays a list of available commands.
 - ?info - Retrieves information about the adventurer/dragon and prints it to the Discord text channel.
 - ?manaspiral - Displays a list of all adventurers with a mana spiral.
+- ?wp - Retrieves specified wyrmprint.
 - ?findwp - Retrieves all wyrmprints that contain requested ability.
 - ?notte - Prints a fun message.
 
