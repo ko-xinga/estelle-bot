@@ -2,14 +2,17 @@ import discord
 from dtoken import TOKEN
 from discord.ext import commands
 import info_methods
+import wp_methods
 import findwp_methods
 import manaspiral_methods
+
 
 ADVENTURER = "adventurer"
 DRAGON = "dragon"
 MAX_LEVEL_TWO = "Description2"
 MAX_LEVEL_THREE = "Description3"
 bot = commands.Bot(command_prefix="?")
+bot.remove_command("help")
 
 
 @bot.event
@@ -18,7 +21,7 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("?commands"))
 
 
-@bot.command()
+@bot.command(aliases=["command", "help"])
 async def commands(ctx):
     """
     Displays a list of available commands.
@@ -98,7 +101,46 @@ async def info(ctx, *, arg: str):
         await ctx.send(f"'{entity}' is not a valid name.")
 
 
-@bot.command()
+@bot.command(aliases=["wyrmprint"])
+async def wp(ctx, *, arg: str):
+    """
+    Retrieves information about wyrmprints that might have a requested ability
+    and prints it to the Discord text channel.
+    :param ctx: Context command was issued
+    :param arg: String entered in by user containing search parameters
+    :return:
+    """
+    RARITY_FIVE = "<:rar_5:630906532179214338>"
+    RARITY_FOUR = "<:rar_4:630906532187340810>"
+    RARITY_THREE = "<:rar_3:630906532199923722>"
+
+    name = arg
+
+    if len(name) < 1:
+        await ctx.send("Please enter a search parameter.")
+    else:
+        wyrmprint = wp_methods.make_dict(name.title())
+        if wyrmprint is None:
+            embedTitle = f"Search Result for: '{name.title()}'"
+            embed = discord.Embed(title=embedTitle, color=0x3D85C6)
+            description = "You may want to refine your search parameter. Please type the full name of the wyrmprint."
+            embed.add_field(name="Nothing here...", value=description, inline=False)
+        else:
+            embed = discord.Embed(color=0x3D85C6)
+            description = findwp_methods.pretty_print(wyrmprint)
+            if wyrmprint["rarity"] == "5":
+                embed.add_field(name=RARITY_FIVE + " " + wyrmprint["name"], value=description, inline=False)
+            if wyrmprint["rarity"] == "4":
+                embed.add_field(name=RARITY_FOUR + " " + wyrmprint["name"], value=description, inline=False)
+            if wyrmprint["rarity"] == "3":
+                embed.add_field(name=RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
+
+    embed.set_footer(text="Type ?commands to get a list of available commands.")
+
+    await ctx.send(embed=embed)
+
+
+@bot.command(aliases=["findwyrmprint", "findwyrmprints"])
 async def findwp(ctx, *, arg: str):
     """
     Retrieves information about wyrmprints that might have a requested ability
@@ -121,21 +163,25 @@ async def findwp(ctx, *, arg: str):
         embedTitle = f"Search Result for Wyrmprints Containing: '{ability}'"
         embed = discord.Embed(title=embedTitle, color=0x3D85C6)
 
-        for wyrmprint in wyrmprintList:
-            description = findwp_methods.pretty_print(wyrmprint)
-            if wyrmprint["rarity"] == "5":
-                embed.add_field(name=RARITY_FIVE + " " + wyrmprint["name"], value=description, inline=False)
-            if wyrmprint["rarity"] == "4":
-                embed.add_field(name=RARITY_FOUR + " " + wyrmprint["name"], value=description, inline=False)
-            if wyrmprint["rarity"] == "3":
-                embed.add_field(name=RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
+        if len(wyrmprintList) == 0:
+            description = "You may want to refine your search parameter."
+            embed.add_field(name="Nothing here...", value=description, inline=False)
+        else:
+            for wyrmprint in wyrmprintList:
+                description = findwp_methods.pretty_print(wyrmprint)
+                if wyrmprint["rarity"] == "5":
+                    embed.add_field(name=RARITY_FIVE + " " + wyrmprint["name"], value=description, inline=False)
+                if wyrmprint["rarity"] == "4":
+                    embed.add_field(name=RARITY_FOUR + " " + wyrmprint["name"], value=description, inline=False)
+                if wyrmprint["rarity"] == "3":
+                    embed.add_field(name=RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
 
         embed.set_footer(text="Type ?commands to get a list of available commands.")
 
         await ctx.send(embed=embed)
 
 
-@bot.command()
+@bot.command(aliases=["manaspiral", "spirals"])
 async def manaspirals(ctx):
     """
     Retrieves a list of adventurers who have obtained a mana spiral.

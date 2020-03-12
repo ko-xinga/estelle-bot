@@ -2,10 +2,10 @@
 Estelle-bot allows for users to quickly search up information about adventurers and dragons from the game Dragalia Lost.
 
 # Commands
-- ?commands - Displays a list of available commands.
+- ?commands (or ?help) - Displays a list of available commands.
 - ?info - Retrieves information about the adventurer/dragon and prints it to the Discord text channel.
+- ?manaspiral - Displays a list of all adventurers with a mana spiral.
 - ?findwp - Retrieves all wyrmprints that contain requested ability.
-- ?manaspirals - Displays a list of all adventurers with a mana spiral.
 - ?notte - Prints a fun message.
 
 # Requirements
