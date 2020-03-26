@@ -30,6 +30,7 @@ CREATE TABLE Adventurers (
     skill_two TEXT,
     skill_two_desc TEXT,
     co_ability TEXT,
+    chain_co_ability TEXT,
     ability_one TEXT,
     ability_two TEXT,
     ability_three TEXT,
@@ -379,12 +380,12 @@ def insert_adventurers(cursorObj, row):
     sql = '''REPLACE INTO Adventurers
                 (id, name, title, class, rarity, 
                 element, weapon, skill_one, skill_one_desc, 
-                skill_two, skill_two_desc, co_ability, ability_one, 
+                skill_two, skill_two_desc, co_ability, chain_co_ability, ability_one, 
                 ability_two, ability_three, release_date, obtain_method, mana_spiral) 
             VALUES
                 (?,?,?,?,?,
                 ?,?,?,?,
-                ?,?,?,?,
+                ?,?,?,?,?,
                 ?,?,?,?,?);
     '''
     if len(row) != 0:
@@ -397,8 +398,8 @@ def insert_adventurers(cursorObj, row):
             skillTwo, skillTwoDesc = separate_skill_desc(row[10])
             cursorObj.execute(sql, (row[0], row[1], row[2], row[3], row[4],
                                     row[5], row[6], skillOne, skillOneDesc,
-                                    skillTwo, skillTwoDesc, row[11].replace(" (Co-ability)", ""), row[12],
-                                    row[13], row[14], row[16], row[17], manaSpiral,))
+                                    skillTwo, skillTwoDesc, row[11].replace(" (Co-ability)", ""), row[12], row[13],
+                                    row[14], row[15], row[17], row[18], manaSpiral,))
         except sqlite3.IntegrityError as error:
             print(f"From insert_adventurers():\n\tDatabase Error: {error}")
 

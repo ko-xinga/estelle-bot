@@ -203,6 +203,7 @@ def print_skills(skillName, description, type):
     Formats the skill and its description so they can be embedded into Discord.
     :param skillName: string representing skill name
     :param description: string representing lengthy skill description
+    :param type: string representing entity type (adventurer or dragon)
     :return: formatted string
     """
     prettyString = ""

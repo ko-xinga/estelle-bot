@@ -74,7 +74,8 @@ async def info(ctx, *, arg: str):
                 embed.add_field(name="Skill 1", value=skillOneDescription, inline=False)
                 embed.add_field(name="Skill 2", value=skillTwoDescription, inline=False)
                 embed.add_field(name="Abilities", value=abilities, inline=False)
-                embed.add_field(name="Co-ability", value=entityDict["co_ability"], inline=False)
+                embed.add_field(name="Co-ability", value=entityDict["co_ability"], inline=True)
+                embed.add_field(name="Chain Co-ability", value=entityDict["chain_co_ability"], inline=True)
 
                 obtainMethod = "This adventurer is obtainable via " + entityDict["obtain_method"] + "."
                 footerTip = "\nType ?commands to get a list of available commands."
