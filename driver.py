@@ -1,4 +1,5 @@
 import discord
+import logging
 from dtoken import TOKEN
 from discord.ext import commands
 import info_methods
@@ -214,5 +215,12 @@ async def notte(ctx):
     """
     await ctx.send("Sweet sassy molassy!")
 
+logger = logging.getLogger("discord")
+# set the threshold for the logger to level
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
+# e.g. 2020-04-20 21:14 : 30,883 : DEBUG:discord.gateway
+handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+logger.addHandler(handler)
 
 bot.run(TOKEN)
