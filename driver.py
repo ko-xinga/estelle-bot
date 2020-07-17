@@ -22,8 +22,8 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("?commands"))
 
 
-@bot.command(aliases=["command", "help"])
-async def commands(ctx):
+@bot.command(aliases=["command", "commands", "help"])
+async def listcommands(ctx):
     """
     Displays a list of available commands.
     :param ctx: Context command was issued
