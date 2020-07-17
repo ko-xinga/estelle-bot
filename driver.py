@@ -22,8 +22,15 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("?commands"))
 
 
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(f"You need to include the name of the adventurer, dragon, or wyrmprint after the command. "
+                       f"For example: `?info Estelle`.")
+
+
 @bot.command(aliases=["command", "commands", "help"])
-async def listcommands(ctx):
+async def list_commands(ctx):
     """
     Displays a list of available commands.
     :param ctx: Context command was issued
