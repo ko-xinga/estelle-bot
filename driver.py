@@ -51,7 +51,7 @@ async def info(ctx, *, arg: str):
     entity = arg.title()
     wordCount = entity.split()
     
-    if len(wordCount) < 3:
+    if len(wordCount) < 4:
         entityDict = info_methods.make_dict(entity)
 
         # check if adventurer or dragon exists first
@@ -71,6 +71,7 @@ async def info(ctx, *, arg: str):
                 icon = discord.File(f"./adventurers/{name}.png", filename=f"{name}.png")
                 embed.set_thumbnail(url=f"attachment://{name}.png")
 
+                formattedName = name.replace(" ", "_")
                 skillOneDescription = info_methods.print_skills(entityDict["skill_one"], entityDict["skill_one_desc"],
                                                                 ADVENTURER)
                 skillTwoDescription = info_methods.print_skills(entityDict["skill_two"], entityDict["skill_two_desc"],
@@ -78,9 +79,23 @@ async def info(ctx, *, arg: str):
                 abilities = info_methods.print_abilities([entityDict["ability_one"], entityDict["ability_two"],
                                                          entityDict["ability_three"]])
 
-                embed.add_field(name="Skill 1", value=skillOneDescription, inline=False)
-                embed.add_field(name="Skill 2", value=skillTwoDescription, inline=False)
+                if len(skillOneDescription) > 1024:
+                    embedCharLimit = "(This character's skill description exceeds Discord's character limit. " \
+                                     "Please see the wiki link below for the full description.)"
+                    embed.add_field(name="Skill 1", value=embedCharLimit, inline=False)
+                else:
+                    embed.add_field(name="Skill 1", value=skillOneDescription, inline=False)
+
+                if len(skillTwoDescription) > 1024:
+                    embedCharLimit = "(This character's skill description exceeds Discord's character limit. " \
+                                     "Please see the wiki link below for the full description.)"
+                    embed.add_field(name="Skill 2", value=embedCharLimit, inline=False)
+                else:
+                    embed.add_field(name="Skill 2", value=skillTwoDescription, inline=False)
+
                 embed.add_field(name="Abilities", value=abilities, inline=False)
+                embed.add_field(name="Wiki Link",
+                                value=f"[Click here](https://dragalialost.gamepedia.com/{formattedName})", inline=False)
                 embed.add_field(name="Co-ability", value=entityDict["co_ability"], inline=True)
                 embed.add_field(name="Chain Co-ability", value=entityDict["chain_co_ability"], inline=True)
 
@@ -97,12 +112,15 @@ async def info(ctx, *, arg: str):
                 icon = discord.File(f"./dragons/{name}.png", filename=f"{name}.png")
                 embed.set_thumbnail(url=f"attachment://{name}.png")
 
+                formattedName = name.replace(" ", "_")
                 skillOneDescription = info_methods.print_skills(entityDict["skill_one"], entityDict["skill_one_desc"],
                                                                 DRAGON)
                 abilities = info_methods.print_abilities([entityDict["ability_one"], entityDict["ability_two"]])
 
                 embed.add_field(name="Skill", value=skillOneDescription, inline=False)
                 embed.add_field(name="Abilities", value=abilities, inline=False)
+                embed.add_field(name="Wiki Link",
+                                value=f"[Click here](https://dragalialost.gamepedia.com/{formattedName})", inline=False)
                 embed.set_footer(text="Type ?commands to get a list of available commands.")
                 await ctx.send(file=icon, embed=embed)
     else:
