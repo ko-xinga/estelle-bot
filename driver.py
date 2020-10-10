@@ -5,6 +5,8 @@ import info_methods
 import wp_methods
 import findwp_methods
 import manaspiral_methods
+import emojis
+import unidecode
 
 
 ADVENTURER = "adventurer"
@@ -25,7 +27,7 @@ async def on_ready():
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(f"You need to include the name of the adventurer, dragon, or wyrmprint after the command. "
-                       f"For example: `?info Estelle`.")
+                       f"For example: `?(insert command here) Estelle`.")
 
 
 @bot.command(aliases=["command", "commands", "help"])
@@ -109,8 +111,10 @@ async def info(ctx, *, arg: str):
                 name = entityDict["name"].replace(" ", "_")
                 emojiString = info_methods.get_dragon_emojis(entityDict["rarity"], entityDict["element"])
                 embed = discord.Embed(title=entityDict["name"], description=emojiString, color=0x3D85C6)
+                print(name)
                 icon = discord.File(f"./dragons/{name}.png", filename=f"{name}.png")
-                embed.set_thumbnail(url=f"attachment://{name}.png")
+                # NOTE: currently issue with accented characters and special chars like &
+                embed.set_thumbnail(url=f"attachment://{unidecode.unidecode(name)}.png")
 
                 formattedName = name.replace(" ", "_")
                 skillOneDescription = info_methods.print_skills(entityDict["skill_one"], entityDict["skill_one_desc"],
@@ -136,10 +140,6 @@ async def wp(ctx, *, arg: str):
     :param arg: String entered in by user containing search parameters
     :return:
     """
-    RARITY_FIVE = "<:rar_5:630906532179214338>"
-    RARITY_FOUR = "<:rar_4:630906532187340810>"
-    RARITY_THREE = "<:rar_3:630906532199923722>"
-
     name = arg
 
     if len(name) < 1:
@@ -155,11 +155,11 @@ async def wp(ctx, *, arg: str):
             embed = discord.Embed(color=0x3D85C6)
             description = findwp_methods.pretty_print(wyrmprint)
             if wyrmprint["rarity"] == "5":
-                embed.add_field(name=RARITY_FIVE + " " + wyrmprint["name"], value=description, inline=False)
+                embed.add_field(name=emojis.RARITY_FIVE + " " + wyrmprint["name"], value=description, inline=False)
             if wyrmprint["rarity"] == "4":
-                embed.add_field(name=RARITY_FOUR + " " + wyrmprint["name"], value=description, inline=False)
+                embed.add_field(name=emojis.RARITY_FOUR + " " + wyrmprint["name"], value=description, inline=False)
             if wyrmprint["rarity"] == "3":
-                embed.add_field(name=RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
+                embed.add_field(name=emojis.RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
 
     embed.set_footer(text="Type ?commands to get a list of available commands.")
 
@@ -175,10 +175,6 @@ async def findwp(ctx, *, arg: str):
     :param arg: String entered in by user containing search parameters
     :return:
     """
-    RARITY_FIVE = "<:rar_5:630906532179214338>"
-    RARITY_FOUR = "<:rar_4:630906532187340810>"
-    RARITY_THREE = "<:rar_3:630906532199923722>"
-
     ability = arg
 
     if len(ability) < 4:
@@ -196,14 +192,72 @@ async def findwp(ctx, *, arg: str):
             for wyrmprint in wyrmprintList:
                 description = findwp_methods.pretty_print(wyrmprint)
                 if wyrmprint["rarity"] == "5":
-                    embed.add_field(name=RARITY_FIVE + " " + wyrmprint["name"], value=description, inline=False)
-                if wyrmprint["rarity"] == "4":
-                    embed.add_field(name=RARITY_FOUR + " " + wyrmprint["name"], value=description, inline=False)
-                if wyrmprint["rarity"] == "3":
-                    embed.add_field(name=RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
+                    wyrmprintName = emojis.RARITY_FIVE + findwp_methods.get_affinity_emoji(wyrmprint["affinity"]) + \
+                           " " + wyrmprint["name"]
+                    embed.add_field(name=wyrmprintName, value=description, inline=False)
+                elif wyrmprint["rarity"] == "4":
+                    wyrmprintName = emojis.RARITY_FOUR + findwp_methods.get_affinity_emoji(wyrmprint["affinity"]) + \
+                           " " + wyrmprint["name"]
+                    embed.add_field(name=wyrmprintName, value=description, inline=False)
+                elif wyrmprint["rarity"] == "3":
+                    wyrmprintName = emojis.RARITY_THREE + findwp_methods.get_affinity_emoji(wyrmprint["affinity"]) + \
+                           " " + wyrmprint["name"]
+                    embed.add_field(name=wyrmprintName, value=description, inline=False)
 
         embed.set_footer(text="Type ?commands to get a list of available commands.")
+        await ctx.send(embed=embed)
 
+
+@bot.command(aliases=["find_affinities"])
+async def affinities(ctx):
+    """
+    Displays a list of affinities (wyrmprint set effects).
+    :param ctx: Context command was issued
+    :return: None
+    """
+    file = open("affinityList.txt", "r")
+    await ctx.send(file.read())
+    file.close()
+
+
+@bot.command(aliases=["find_affinity"])
+async def affinity(ctx, *, arg: str):
+    """
+    Retrieves a list of wyrmprints with the requested affinity.
+    :param ctx: Context command was issued
+    :param arg: String entered in by user containing search parameters
+    :return:
+    """
+    ability = arg
+
+    if len(ability) < 4:
+        await ctx.send("Please enter a longer search parameter.")
+    else:
+        # get list of wyrmprints (dictionaries)
+        wyrmprintList = findwp_methods.make_affinity_list(ability)
+        embedTitle = f"Search Result for Wyrmprints Containing the Affinity: '{ability}'"
+        embed = discord.Embed(title=embedTitle, color=0x3D85C6)
+
+        if len(wyrmprintList) == 0:
+            description = "You may want to fix your spelling of the affinity."
+            embed.add_field(name="Nothing here...", value=description, inline=False)
+        else:
+            for wyrmprint in wyrmprintList:
+                description = findwp_methods.pretty_print(wyrmprint)
+                if wyrmprint["rarity"] == "5":
+                    wyrmprintName = emojis.RARITY_FIVE + findwp_methods.get_affinity_emoji(wyrmprint["affinity"]) + \
+                           " " + wyrmprint["name"]
+                    embed.add_field(name=wyrmprintName, value=description, inline=False)
+                elif wyrmprint["rarity"] == "4":
+                    wyrmprintName = emojis.RARITY_FOUR + findwp_methods.get_affinity_emoji(wyrmprint["affinity"]) + \
+                           " " + wyrmprint["name"]
+                    embed.add_field(name=wyrmprintName, value=description, inline=False)
+                elif wyrmprint["rarity"] == "3":
+                    wyrmprintName = emojis.RARITY_THREE + findwp_methods.get_affinity_emoji(wyrmprint["affinity"]) + \
+                           " " + wyrmprint["name"]
+                    embed.add_field(name=wyrmprintName, value=description, inline=False)
+
+        embed.set_footer(text="Type ?commands to get a list of available commands.")
         await ctx.send(embed=embed)
 
 
@@ -214,17 +268,13 @@ async def manaspirals(ctx):
     :param ctx: Context command was issued
     :return:
     """
-    RARITY_FIVE = "<:rar_5:630906532179214338>"
-    RARITY_FOUR = "<:rar_4:630906532187340810>"
-    RARITY_THREE = "<:rar_3:630906532199923722>"
-
     adventurerList = manaspiral_methods.make_list()
     embedTitle = f"List of Adventurers with a Mana Spiral:"
     embed = discord.Embed(title=embedTitle, color=0x3D85C6)
 
-    embed.add_field(name=RARITY_FIVE + " 5", value=manaspiral_methods.pretty_print(adventurerList, "5"), inline=False)
-    embed.add_field(name=RARITY_FOUR + " 4", value=manaspiral_methods.pretty_print(adventurerList, "4"), inline=False)
-    embed.add_field(name=RARITY_THREE + " 3", value=manaspiral_methods.pretty_print(adventurerList, "3"), inline=False)
+    embed.add_field(name=emojis.RARITY_FIVE + " 5", value=manaspiral_methods.pretty_print(adventurerList, "5"), inline=False)
+    embed.add_field(name=emojis.RARITY_FOUR + " 4", value=manaspiral_methods.pretty_print(adventurerList, "4"), inline=False)
+    embed.add_field(name=emojis.RARITY_THREE + " 3", value=manaspiral_methods.pretty_print(adventurerList, "3"), inline=False)
     embed.set_footer(text="Type ?commands to get a list of available commands.")
 
     await ctx.send(embed=embed)

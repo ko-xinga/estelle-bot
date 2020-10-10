@@ -58,9 +58,9 @@ INITIALIZE_WYRMPRINTS_COMMAND = """
 CREATE TABLE Wyrmprints (
     name TEXT PRIMARY KEY,
     rarity TEXT,
+    affinity TEXT,
     ability_one TEXT,
-    ability_two TEXT,
-    ability_three TEXT
+    ability_two TEXT
 );
 """
 
@@ -205,6 +205,7 @@ def update_wyrmprints(cursorObj):
     Scrape wiki and update the Wyrmprints table.
     :param cursorObj: cursor pointing to sqlite database
     :return: none
+    column 0 = icon, column 1 = name, column 2 = rarity, column 5 = affinity, column 6/7 = abilities
     """
     response = requests.get(WYRMPRINT_URL)
     html = response.text
@@ -214,7 +215,7 @@ def update_wyrmprints(cursorObj):
     wyrmprintList = []
 
     # create a list containing all the information about the wyrmprint
-    for row in rawTable.find_all("tr"):
+    for row in rawTable.find_all("tr", {"class": "character-grid-entry"}):
         columns = row.find_all("td")
         for column in columns:
             # get value at current column
@@ -228,8 +229,12 @@ def update_wyrmprints(cursorObj):
             if len(columns) != 0 and column == columns[2]:
                 wyrmprintList.append(value)
 
-            # get the name of the first ability manually
+            # get the affinity label if applicable
             if len(columns) != 0 and column == columns[5]:
+                wyrmprintList.append(value)
+
+            # get the name of the first ability manually
+            if len(columns) != 0 and column == columns[-3]:
                 title = column.find_all("a")
                 try:
                     wyrmprintList.append(title[-1].text)
@@ -237,15 +242,7 @@ def update_wyrmprints(cursorObj):
                     wyrmprintList.append("")
 
             # get the name of the second ability manually
-            if len(columns) != 0 and column == columns[6]:
-                title = column.find_all("a")
-                try:
-                    wyrmprintList.append(title[-1].text)
-                except IndexError:
-                    wyrmprintList.append("")
-
-            # get the name of the third ability manually
-            if len(columns) != 0 and column == columns[7]:
+            if len(columns) != 0 and column == columns[-2]:
                 title = column.find_all("a")
                 try:
                     wyrmprintList.append(title[-1].text)
@@ -435,13 +432,18 @@ def insert_wyrmprints(cursorObj, row):
     :return: none
     """
     sql = '''REPLACE INTO Wyrmprints
-                    (name, rarity, ability_one, ability_two, ability_three) 
+                    (name, rarity, affinity, ability_one, ability_two) 
                 VALUES
                     (?,?,?,?,?);
         '''
     if len(row) != 0:
         try:
-            cursorObj.execute(sql, (row[0], row[1], row[2], row[3], row[4],))
+            # if wyrmprint has affinity
+            if len(row) == 5:
+                affinityName = row[2].split("\n")[0]
+                cursorObj.execute(sql, (row[0], row[1], affinityName, row[3], row[4],))
+            else:
+                cursorObj.execute(sql, (row[0], row[1], "", row[2], row[3],))
         except sqlite3.IntegrityError as error:
             print(f"From insert_wyrmprints():\n\tDatabase Error: {error}")
 

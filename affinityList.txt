@@ -1,0 +1,15 @@
+```
+(Bull's Boon 2|2) Reduces susceptibility to paralysis by 100%
+(Lance's Boon 2|3|4) Increases force strike damage by 5|8|15%.
+(Wolf's Boon 2|2) Reduces susceptibility to stun by 100%.
+(Sword's Boon 4|4) Increases strength by 8%.
+(Serpent's Boon 2|2) Reduces susceptibility to curses by 100%.
+(Eagle's Boon 2|2) Reduces susceptibility to burning by 100%.
+(Axe's Boon 4|4) Increases damage to enemies in break state by 10%.
+(Crown's Boon 4|4) Increases attack skill damage by 10%.
+(Bow's Boon 3|4) Increases skill gauge fill rate by 6|10%.
+(Staff's Boon 2|3|4) Increases duration of buff skills by 5|8|15%.
+(Dragon's Boon 2|3|4) Adds 10|18|30% to the modifier applied to damage when in dragon form.
+
+Enter the command: ?affinity Bull's Boon (as an example) to find all wyrmprints that have that affinity.
+```

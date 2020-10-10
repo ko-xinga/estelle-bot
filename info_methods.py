@@ -1,34 +1,8 @@
 import sqlite3
+import emojis
 
 ADVENTURER = "adventurer"
 DRAGON = "dragon"
-
-# replace emoji ID's below; to get the emoji id, put a \ in front of the emoji in discord chat and press enter
-RARITY_FIVE = "<:rar_5:630906532179214338>"
-RARITY_FOUR = "<:rar_4:630906532187340810>"
-RARITY_THREE = "<:rar_3:630906532199923722>"
-
-ELEMENT_FLAME = "<:ele_flame:630911804591177758>"
-ELEMENT_WIND = "<:ele_wind:630906532296392704>"
-ELEMENT_WATER = "<:ele_water:630906531902390278>"
-ELEMENT_LIGHT = "<:ele_light:630906531763847169>"
-ELEMENT_SHADOW = "<:ele_shadow:630906531956785153>"
-
-WEAPON_SWORD = "<:wep_sword:630906532271357972>"
-WEAPON_BLADE = "<:wep_blade:630906532271357953>"
-WEAPON_DAGGER = "<:wep_dagger:630906532275683388>"
-WEAPON_AXE = "<:wep_axe:630906534309658654>"
-WEAPON_LANCE = "<:wep_lance:630906532279877664>"
-WEAPON_BOW = "<:wep_bow:630906532292460575>"
-WEAPON_WAND = "<:wep_wand:630906532288266240>"
-WEAPON_STAFF = "<:wep_staff:630906532271226880>"
-
-CLASS_ATTACK = "<:class_attack:630906532191535134>"
-CLASS_DEFENSE = "<:class_defense:630906532233740298>"
-CLASS_SUPPORT = "<:class_support:630906532242128907>"
-CLASS_HEALING = "<:class_healing:630906532321689600>"
-
-MANA_SPIRAL = "<:mana_spiral:667919282310479894>"
 
 
 def make_dict(entityName):
@@ -114,51 +88,51 @@ def get_adv_emojis(rarity, element, weapon, advClass, manaSpiral):
     spiralEmoji = ""
 
     if rarity == "5":
-        rarityEmoji = RARITY_FIVE
+        rarityEmoji = emojis.RARITY_FIVE
     elif rarity == "4":
-        rarityEmoji = RARITY_FOUR
+        rarityEmoji = emojis.RARITY_FOUR
     elif rarity == "3":
-        rarityEmoji = RARITY_THREE
+        rarityEmoji = emojis.RARITY_THREE
 
     if element == "Flame":
-        elementEmoji = ELEMENT_FLAME
+        elementEmoji = emojis.ELEMENT_FLAME
     elif element == "Wind":
-        elementEmoji = ELEMENT_WIND
+        elementEmoji = emojis.ELEMENT_WIND
     elif element == "Water":
-        elementEmoji = ELEMENT_WATER
+        elementEmoji = emojis.ELEMENT_WATER
     elif element == "Light":
-        elementEmoji = ELEMENT_LIGHT
+        elementEmoji = emojis.ELEMENT_LIGHT
     elif element == "Shadow":
-        elementEmoji = ELEMENT_SHADOW
+        elementEmoji = emojis.ELEMENT_SHADOW
 
     if weapon == "Sword":
-        weaponEmoji = WEAPON_SWORD
+        weaponEmoji = emojis.WEAPON_SWORD
     elif weapon == "Blade":
-        weaponEmoji = WEAPON_BLADE
+        weaponEmoji = emojis.WEAPON_BLADE
     elif weapon == "Dagger":
-        weaponEmoji = WEAPON_DAGGER
+        weaponEmoji = emojis.WEAPON_DAGGER
     elif weapon == "Axe":
-        weaponEmoji = WEAPON_AXE
+        weaponEmoji = emojis.WEAPON_AXE
     elif weapon == "Lance":
-        weaponEmoji = WEAPON_LANCE
+        weaponEmoji = emojis.WEAPON_LANCE
     elif weapon == "Bow":
-        weaponEmoji = WEAPON_BOW
+        weaponEmoji = emojis.WEAPON_BOW
     elif weapon == "Wand":
-        weaponEmoji = WEAPON_WAND
+        weaponEmoji = emojis.WEAPON_WAND
     if weapon == "Staff":
-        weaponEmoji = WEAPON_STAFF
+        weaponEmoji = emojis.WEAPON_STAFF
 
     if advClass == "Attack":
-        classEmoji = CLASS_ATTACK
+        classEmoji = emojis.CLASS_ATTACK
     elif advClass == "Defense":
-        classEmoji = CLASS_DEFENSE
+        classEmoji = emojis.CLASS_DEFENSE
     elif advClass == "Support":
-        classEmoji = CLASS_SUPPORT
+        classEmoji = emojis.CLASS_SUPPORT
     elif advClass == "Healing":
-        classEmoji = CLASS_HEALING
+        classEmoji = emojis.CLASS_HEALING
 
     if manaSpiral == "yes":
-        spiralEmoji = MANA_SPIRAL
+        spiralEmoji = emojis.MANA_SPIRAL
 
     prettyString = rarityEmoji + elementEmoji + weaponEmoji + classEmoji + spiralEmoji
 
@@ -176,22 +150,22 @@ def get_dragon_emojis(rarity, element):
     elementEmoji = ""
 
     if rarity == "5":
-        rarityEmoji = RARITY_FIVE
+        rarityEmoji = emojis.RARITY_FIVE
     elif rarity == "4":
-        rarityEmoji = RARITY_FOUR
+        rarityEmoji = emojis.RARITY_FOUR
     elif rarity == "3":
-        rarityEmoji = RARITY_THREE
+        rarityEmoji = emojis.RARITY_THREE
 
     if element == "Flame":
-        elementEmoji = ELEMENT_FLAME
+        elementEmoji = emojis.ELEMENT_FLAME
     elif element == "Wind":
-        elementEmoji = ELEMENT_WIND
+        elementEmoji = emojis.ELEMENT_WIND
     elif element == "Water":
-        elementEmoji = ELEMENT_WATER
+        elementEmoji = emojis.ELEMENT_WATER
     elif element == "Light":
-        elementEmoji = ELEMENT_LIGHT
+        elementEmoji = emojis.ELEMENT_LIGHT
     elif element == "Shadow":
-        elementEmoji = ELEMENT_SHADOW
+        elementEmoji = emojis.ELEMENT_SHADOW
 
     prettyString = rarityEmoji + elementEmoji
 

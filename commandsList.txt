@@ -1,8 +1,12 @@
-```?commands - Displays a list of available commands. You just used this one. ;)
+```
+?help - Displays a list of available commands. You just used this one. ;)
 ?info - Retrieves information about the adventurer/dragon and prints it to the Discord text channel.
 ?manaspiral - Displays a list of all adventurers with a mana spiral.
 ?wp - Retrieves specified wyrmprint.
 ?findwp - Retrieves all wyrmprints that contain requested ability.
+?affinities - Displays a list of all affinities (wyrmprint set effects).
+?affinity - Displays a list of all wyrmprints containing the specified affinity.
 ?notte - Prints a fun message.
 
-If you have any suggestions, please DM Koxinga!```
+If you have any suggestions, please DM Koxinga!
+```
