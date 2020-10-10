@@ -155,11 +155,17 @@ async def wp(ctx, *, arg: str):
             embed = discord.Embed(color=0x3D85C6)
             description = findwp_methods.pretty_print(wyrmprint)
             if wyrmprint["rarity"] == "5":
-                embed.add_field(name=emojis.RARITY_FIVE + " " + wyrmprint["name"], value=description, inline=False)
+                wyrmprintName = emojis.RARITY_FIVE + findwp_methods.get_affinity_emoji(wyrmprint["affinity"]) + \
+                                " " + wyrmprint["name"]
+                embed.add_field(name=wyrmprintName, value=description, inline=False)
             if wyrmprint["rarity"] == "4":
-                embed.add_field(name=emojis.RARITY_FOUR + " " + wyrmprint["name"], value=description, inline=False)
+                wyrmprintName = emojis.RARITY_FOUR + findwp_methods.get_affinity_emoji(wyrmprint["affinity"]) + \
+                                " " + wyrmprint["name"]
+                embed.add_field(name=wyrmprintName, value=description, inline=False)
             if wyrmprint["rarity"] == "3":
-                embed.add_field(name=emojis.RARITY_THREE + " " + wyrmprint["name"], value=description, inline=False)
+                wyrmprintName = emojis.RARITY_THREE + findwp_methods.get_affinity_emoji(wyrmprint["affinity"]) + \
+                                " " + wyrmprint["name"]
+                embed.add_field(name=wyrmprintName, value=description, inline=False)
 
     embed.set_footer(text="Type ?commands to get a list of available commands.")
 
