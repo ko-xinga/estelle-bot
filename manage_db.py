@@ -2,6 +2,7 @@ import sqlite3
 import requests
 import urllib.request as urlreq
 import os
+import unidecode
 from bs4 import BeautifulSoup
 
 ADVENTURER_URL = "https://dragalialost.wiki/w/Adventurer_Detailed_List"
@@ -272,7 +273,7 @@ def download_images(cursorObj):
         # split idVariation into id and entity variation
         (idVariation, name, rarity) = row
         idList = idVariation.split("_")
-        name = name.replace(" ", "_")
+        name = unidecode.unidecode(name.replace(" ", "_"))
         # download picture if it doesn't already exist
         if not os.path.isfile(f"./adventurers/{name}.png"):
             try:
@@ -293,7 +294,7 @@ def download_images(cursorObj):
         # split idVariation into id and entity variation
         (idVariation, name) = row
         idList = idVariation.split("_")
-        name = name.replace(" ", "_")
+        name = unidecode.unidecode(name.replace(" ", "_"))
         # download picture if it doesn't already exist
         if not os.path.isfile(f"./dragons/{name}.png"):
             try:
@@ -384,7 +385,7 @@ def insert_adventurers(cursorObj, row):
                 manaSpiral = "no"
             skillOne, skillOneDesc = separate_skill_desc(row[9])
             skillTwo, skillTwoDesc = separate_skill_desc(row[10])
-            cursorObj.execute(sql, (row[0], row[1], row[2], row[3], row[4],
+            cursorObj.execute(sql, (row[0], unidecode.unidecode(row[1]), row[2], row[3], row[4],
                                     row[5], row[6], skillOne, skillOneDesc,
                                     skillTwo, skillTwoDesc, row[11].replace(" (Co-ability)", ""), row[12], row[13],
                                     row[14], row[15], row[17], row[18], manaSpiral,))
@@ -409,7 +410,7 @@ def insert_dragons(cursorObj, row):
     if len(row) != 0:
         try:
             skillOne, skillOneDesc = separate_skill_desc(row[6])
-            cursorObj.execute(sql, (row[0], row[1], row[2], row[3], skillOne,
+            cursorObj.execute(sql, (row[0], unidecode.unidecode(row[1]), row[2], row[3], skillOne,
                                     skillOneDesc, row[7], row[8], row[9],))
         except sqlite3.IntegrityError as error:
             print(f"From insert_dragons():\n\tDatabase Error: {error}")

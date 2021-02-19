@@ -6,6 +6,7 @@ import wp_methods
 import findwp_methods
 import manaspiral_methods
 import emojis
+import string
 import unidecode
 
 
@@ -16,6 +17,7 @@ MAX_LEVEL_THREE = "Description3"
 bot = commands.Bot(command_prefix="?")
 bot.remove_command("help")
 
+print("Program now running...")
 
 @bot.event
 async def on_ready():
@@ -50,7 +52,7 @@ async def info(ctx, *, arg: str):
     :param arg: String entered in by user containing entity name
     :return: None
     """
-    entity = arg.title()
+    entity = string.capwords(arg)
     wordCount = entity.split()
     
     if len(wordCount) < 4:
@@ -71,7 +73,7 @@ async def info(ctx, *, arg: str):
                                                           entityDict["mana_spiral"])
                 embed = discord.Embed(title=entityDict["name"], description=emojiString, color=0x3D85C6)
                 icon = discord.File(f"./adventurers/{name}.png", filename=f"{name}.png")
-                embed.set_thumbnail(url=f"attachment://{name}.png")
+                embed.set_thumbnail(url=f"attachment://{unidecode.unidecode(name)}.png")
 
                 formattedName = name.replace(" ", "_")
                 skillOneDescription = info_methods.print_skills(entityDict["skill_one"], entityDict["skill_one_desc"],
@@ -97,7 +99,7 @@ async def info(ctx, *, arg: str):
 
                 embed.add_field(name="Abilities", value=abilities, inline=False)
                 embed.add_field(name="Wiki Link",
-                                value=f"[Click here](https://dragalialost.gamepedia.com/{formattedName})", inline=False)
+                                value=f"[Click here](https://dragalialost.wiki/{formattedName})", inline=False)
                 embed.add_field(name="Co-ability", value=entityDict["co_ability"], inline=True)
                 embed.add_field(name="Chain Co-ability", value=entityDict["chain_co_ability"], inline=True)
 
@@ -124,7 +126,7 @@ async def info(ctx, *, arg: str):
                 embed.add_field(name="Skill", value=skillOneDescription, inline=False)
                 embed.add_field(name="Abilities", value=abilities, inline=False)
                 embed.add_field(name="Wiki Link",
-                                value=f"[Click here](https://dragalialost.gamepedia.com/{formattedName})", inline=False)
+                                value=f"[Click here](https://dragalialost.wiki/{formattedName})", inline=False)
                 embed.set_footer(text="Type ?commands to get a list of available commands.")
                 await ctx.send(file=icon, embed=embed)
     else:
