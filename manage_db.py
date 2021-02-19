@@ -4,9 +4,9 @@ import urllib.request as urlreq
 import os
 from bs4 import BeautifulSoup
 
-ADVENTURER_URL = "https://dragalialost.gamepedia.com/Adventurer_Detailed_List"
-DRAGON_URL = "https://dragalialost.gamepedia.com/Dragon_List"
-WYRMPRINT_URL = "https://dragalialost.gamepedia.com/Wyrmprint_List"
+ADVENTURER_URL = "https://dragalialost.wiki/w/Adventurer_Detailed_List"
+DRAGON_URL = "https://dragalialost.wiki/w/Dragon_List"
+WYRMPRINT_URL = "https://dragalialost.wiki/w/Wyrmprint_List"
 
 ADVENTURER = "adventurer"
 DRAGON = "dragon"
@@ -276,7 +276,7 @@ def download_images(cursorObj):
         # download picture if it doesn't already exist
         if not os.path.isfile(f"./adventurers/{name}.png"):
             try:
-                response = requests.get(f"https://dragalialost.gamepedia.com/File:{idList[0]}_{idList[1]}_r0{rarity}.png")
+                response = requests.get(f"https://dragalialost.wiki/File:{idList[0]}_{idList[1]}_r0{rarity}.png")
                 html = response.text
                 soup = BeautifulSoup(html, "html.parser")
                 div = soup.find("div", {"class": "fullImageLink"})
@@ -284,7 +284,7 @@ def download_images(cursorObj):
             except AttributeError:
                 print(f"Error: Unable to download ID {idList[0]} variation {idList[1]}")
             else:
-                urlreq.urlretrieve(link, f"./adventurers/{name}.png")
+                urlreq.urlretrieve("https://dragalialost.wiki"+link, f"./adventurers/{name}.png")
 
     # retrieve all dragon images
     cursorObj.execute("SELECT id, name FROM Dragons")
@@ -297,7 +297,7 @@ def download_images(cursorObj):
         # download picture if it doesn't already exist
         if not os.path.isfile(f"./dragons/{name}.png"):
             try:
-                response = requests.get(f"https://dragalialost.gamepedia.com/File:{idList[0]}__{idList[1]}.png")
+                response = requests.get(f"https://dragalialost.wiki/File:{idList[0]}__{idList[1]}.png")
                 html = response.text
                 soup = BeautifulSoup(html, "html.parser")
                 div = soup.find("div", {"class": "fullImageLink"})
@@ -305,7 +305,7 @@ def download_images(cursorObj):
             except AttributeError:
                 print(f"Error: Unable to download ID {idList[0]} variation {idList[1]}")
             else:
-                urlreq.urlretrieve(link, f"./dragons/{name}.png")
+                urlreq.urlretrieve("https://dragalialost.wiki"+link, f"./dragons/{name}.png")
 
 
 def separate_skill_desc(skillBlock):
@@ -318,34 +318,25 @@ def separate_skill_desc(skillBlock):
     skillDesc = ""
 
     if len(skillBlock) > 0:
-        # split skill description until we get the final level of the skill
-        stringListOne = skillBlock.split("Lv. 1: ")
-        if "Lv. 2:" in stringListOne[1]:
-            stringListTwo = stringListOne[1].split("Lv. 2:")
-            if "Lv. 3:" in stringListTwo[1]:
-                stringListThree = stringListTwo[1].split("Lv. 3:")
-                try:
-                    stringListFour = stringListThree[1].split("Lv. 4:")
-                # maximum skill level is three
-                except IndexError:
-                    stringListThree = stringListTwo[1].split("Lv. 3:")
-                    skill = stringListOne[0].strip()
-                    skillDesc = stringListThree[-1].strip()
-                    return skill, skillDesc
-                # maximum skill level is four (via mana spiral)
-                else:
-                    skill = stringListOne[0].strip()
-                    skillDesc = stringListFour[-1].strip()
-                    return skill, skillDesc
-            # maximum skill level is two
-            else:
-                skill = stringListOne[0].strip()
-                skillDesc = stringListTwo[-1].strip()
-                return skill, skillDesc
-        # maximum skill level is one
-        else:
-            skill = stringListOne[0].strip()
-            skillDesc = stringListOne[-1].strip()
+        if "Lv. 4:" in skillBlock:
+            stringList = skillBlock.split("Lv. 4: ")
+            skill = stringList[0]
+            skillDesc = stringList[1]
+            return skill, skillDesc
+        elif "Lv. 3:" in skillBlock:
+            stringList = skillBlock.split("Lv. 3: ")
+            skill = stringList[0]
+            skillDesc = stringList[1]
+            return skill, skillDesc
+        elif "Lv. 2:" in skillBlock:
+            stringList = skillBlock.split("Lv. 2: ")
+            skill = stringList[0]
+            skillDesc = stringList[1]
+            return skill, skillDesc
+        elif "Lv. 1:" in skillBlock:
+            stringList = skillBlock.split("Lv. 1: ")
+            skill = stringList[0]
+            skillDesc = stringList[1]
             return skill, skillDesc
     else:
         return skill, skillDesc
