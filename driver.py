@@ -147,9 +147,9 @@ async def wp(ctx, *, arg: str):
     if len(name) < 1:
         await ctx.send("Please enter a search parameter.")
     else:
-        wyrmprint = wp_methods.make_dict(name)
+        wyrmprint = wp_methods.make_dict(string.capwords(name))
         if wyrmprint is None:
-            embedTitle = f"Search Result for: '{name.title()}'"
+            embedTitle = f"Search Result for: '{string.capwords(name)}'"
             embed = discord.Embed(title=embedTitle, color=0x3D85C6)
             description = "You may want to refine your search parameter. Please type the full name of the wyrmprint."
             embed.add_field(name="Nothing here...", value=description, inline=False)
