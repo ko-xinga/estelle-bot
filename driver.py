@@ -19,7 +19,7 @@ MAX_LEVEL_TWO = "Description2"
 MAX_LEVEL_THREE = "Description3"
 bot = commands.Bot(command_prefix="?")
 bot.remove_command("help")
-GATHERING_HUB = 605433387402133536
+BOT_CHANNEL = 605438885207736345
 
 print("Program now running...")
 
@@ -32,7 +32,7 @@ async def on_ready():
 @aiocron.crontab("0 10 * * *")
 async def show_schedule():
     # bot will display schedule at 10:00 AM EST every day
-    channel = bot.get_channel(GATHERING_HUB)
+    channel = bot.get_channel(BOT_CHANNEL)
     # returns an integer 0-6 representing weekday
     dayOfWeek = datetime.datetime.today().weekday()
     dt = datetime.datetime.today()
