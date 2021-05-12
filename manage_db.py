@@ -285,7 +285,7 @@ def update_wyrmprints(cursorObj):
 
             # get the rarity of the wyrmprint
             if len(columns) != 0 and column == columns[2]:
-               wyrmprintList.append(value)
+                wyrmprintList.append(value)
 
             # get the affinity label if applicable
             if len(columns) != 0 and column == columns[5]:
@@ -306,7 +306,6 @@ def update_wyrmprints(cursorObj):
                     wyrmprintList.append(title[-1].text)
                 except IndexError:
                     wyrmprintList.append("")
-            print("end", wyrmprintList)
 
         # populates table row by row
         if None not in wyrmprintList and "None" not in wyrmprintList:
