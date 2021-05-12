@@ -266,11 +266,15 @@ def update_wyrmprints(cursorObj):
     soup = BeautifulSoup(html, "html.parser")
     rawTable = soup.find("table", {"class": "wikitable"})
 
+    # expected size of 5: name, rarity, affinity, ability_one, ability_two
     wyrmprintList = []
 
     # create a list containing all the information about the wyrmprint
     for row in rawTable.find_all("tr"):
         columns = row.find_all("td")
+        # skip empty td tags
+        if len(columns) < 5:
+            continue
         for column in columns:
             # get value at current column
             value = column.text.strip()
@@ -281,7 +285,7 @@ def update_wyrmprints(cursorObj):
 
             # get the rarity of the wyrmprint
             if len(columns) != 0 and column == columns[2]:
-                wyrmprintList.append(value)
+               wyrmprintList.append(value)
 
             # get the affinity label if applicable
             if len(columns) != 0 and column == columns[5]:
@@ -302,6 +306,7 @@ def update_wyrmprints(cursorObj):
                     wyrmprintList.append(title[-1].text)
                 except IndexError:
                     wyrmprintList.append("")
+            print("end", wyrmprintList)
 
         # populates table row by row
         if None not in wyrmprintList and "None" not in wyrmprintList:
