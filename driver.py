@@ -5,9 +5,12 @@ import info_methods
 import wp_methods
 import findwp_methods
 import manaspiral_methods
+import schedule_methods
 import emojis
 import string
 import unidecode
+import aiocron
+import datetime
 
 
 ADVENTURER = "adventurer"
@@ -16,6 +19,7 @@ MAX_LEVEL_TWO = "Description2"
 MAX_LEVEL_THREE = "Description3"
 bot = commands.Bot(command_prefix="?")
 bot.remove_command("help")
+GATHERING_HUB = 605433387402133536
 
 print("Program now running...")
 
@@ -23,6 +27,37 @@ print("Program now running...")
 async def on_ready():
     print("Estelle-bot is now running.")
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("?commands"))
+
+
+@aiocron.crontab("0 10 * * *")
+async def show_schedule():
+    # bot will display schedule at 10:00 AM EST every day
+    channel = bot.get_channel(GATHERING_HUB)
+    # returns an integer 0-6 representing weekday
+    dayOfWeek = datetime.datetime.today().weekday()
+    dt = datetime.datetime.today()
+
+    embed = discord.Embed(title="("+str(dt.month)+"/"+str(dt.day)+") Schedule for Today and Tomorrow",
+                          color=0x3D85C6)
+    embed.add_field(name=emojis.VOID_ICON + " Today's 2x Void Battles",
+                    value=schedule_methods.pretty_print(schedule_methods.make_void_list(dayOfWeek)),
+                    inline=False)
+    embed.add_field(name=emojis.HDT_ICON + " Today's Available Master Dragons",
+                    value=schedule_methods.pretty_print(schedule_methods.make_master_dragon_list(dayOfWeek)),
+                    inline=False)
+    embed.add_field(name="\u200b",
+                    value="\u200b",
+                    inline=False)
+    embed.add_field(name=emojis.VOID_ICON + " Tomorrow's 2x Void Battles",
+                    value=schedule_methods.pretty_print(schedule_methods.make_void_list((dayOfWeek+1) % 7)),
+                    inline=False)
+    embed.add_field(name=emojis.HDT_ICON + " Tomorrow's Available Master Dragons",
+                    value=schedule_methods.pretty_print(schedule_methods.make_master_dragon_list((dayOfWeek + 1) % 7)),
+                    inline=False)
+
+    footerTip = "\nType ?commands to get a list of available commands."
+    embed.set_footer(text=footerTip)
+    await channel.send(embed=embed)
 
 
 @bot.event

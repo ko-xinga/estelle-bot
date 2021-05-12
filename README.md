@@ -15,9 +15,10 @@ Estelle-bot allows for users to quickly search up information about adventurers 
 - sqlite3
 - beautifulsoup4
 - requests
+- aiocron
 
 # Examples
 ![?info AdventurerName](https://i.imgur.com/19Bi4IE.png)
 
 # To-do
-- ???
+- More features.
