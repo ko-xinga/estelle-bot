@@ -23,13 +23,14 @@ BOT_CHANNEL = 605438885207736345
 
 print("Program now running...")
 
+
 @bot.event
 async def on_ready():
     print("Estelle-bot is now running.")
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("?commands"))
 
 
-@aiocron.crontab("0 10 * * *")
+@aiocron.crontab("30 10 * * *")
 async def show_schedule():
     # bot will display schedule at 10:00 AM EST every day
     channel = bot.get_channel(BOT_CHANNEL)
