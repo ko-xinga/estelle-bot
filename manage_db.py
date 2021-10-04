@@ -4,6 +4,9 @@ import urllib.request as urlreq
 import os
 import unidecode
 from bs4 import BeautifulSoup
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 ADVENTURER_URL = "https://dragalialost.wiki/w/Adventurer_Detailed_List"
 DRAGON_URL = "https://dragalialost.wiki/w/Dragon_List"
@@ -129,32 +132,6 @@ def initialize_wyrmprints(cursorObj):
         cursorObj.execute(INITIALIZE_WYRMPRINTS_COMMAND)
     except sqlite3.OperationalError as error:
         print(f"From initialize_wyrmprints():\n\tDatabase Error: {error}")
-        return error
-
-
-def initialize_void_schedule(cursorObj):
-    """
-    Creates VoidSchedule table.
-    :param cursorObj: cursor pointing to sqlite database
-    :return: error
-    """
-    try:
-        cursorObj.execute(INITIALIZE_VOID_SCHEDULE_COMMAND)
-    except sqlite3.OperationalError as error:
-        print(f"From initialize_void_schedule():\n\tDatabase Error: {error}")
-        return error
-
-
-def initialize_master_dragon_schedule(cursorObj):
-    """
-    Creates MasterDragonSchedule table.
-    :param cursorObj: cursor pointing to sqlite database
-    :return: error
-    """
-    try:
-        cursorObj.execute(INITIALIZE_MASTER_DRAGON_SCHEDULE_COMMAND)
-    except sqlite3.OperationalError as error:
-        print(f"From initialize_master_dragon_schedule():\n\tDatabase Error: {error}")
         return error
 
 
@@ -313,68 +290,6 @@ def update_wyrmprints(cursorObj):
         wyrmprintList = []
 
 
-def update_void_schedule(cursorObj):
-    """
-    Scrape wiki and update the VoidSchedule table.
-    :param cursorObj: cursor pointing to sqlite database
-    :return: none
-    quest may have one or two days with double drops
-    """
-    response = requests.get(MAIN_URL)
-    html = response.text
-    soup = BeautifulSoup(html, "html.parser")
-    rawTableList = soup.find_all("table", {"class": "wikitable center"})
-
-    voidList = []
-
-    # create a list containing all the information about the wyrmprint; use first table on main wiki page
-    for row in rawTableList[0].find_all("tr"):
-        columns = row.find_all("td")
-        for column in columns:
-            # get value at current column
-            value = column.text.strip()
-            # want to replace the checkmark with a simple dash
-            if len(value) < 2 and value != "x2":
-                value = "-"
-            voidList.append(value)
-
-        if None not in voidList and "None" not in voidList:
-            insert_void_schedule(cursorObj, voidList)
-        voidList = []
-
-
-def update_master_dragon_schedule(cursorObj):
-    """
-    Scrape wiki and update the MasterDragonSchedule table.
-    :param cursorObj: cursor pointing to sqlite database
-    :return: none
-    master dragon availability depends on day
-    """
-    response = requests.get(MAIN_URL)
-    html = response.text
-    soup = BeautifulSoup(html, "html.parser")
-    rawTableList = soup.find_all("table", {"class": "wikitable center"})
-
-    masterList = []
-
-    # create a list containing all the information about the wyrmprint; use second table on main wiki page
-    for row in rawTableList[1].find_all("tr"):
-        columns = row.find_all("td")
-        for column in columns:
-            # get value at current column
-            value = column.text.strip()
-            # want to replace the checkmark with a simple dash
-            if value == "✓":
-                value = "yes"
-            elif value == "✘":
-                value = "-"
-            masterList.append(value)
-
-        if None not in masterList and "None" not in masterList:
-            insert_master_dragon_schedule(cursorObj, masterList)
-        masterList = []
-
-
 def download_images(cursorObj):
     """
     Downloads the icons of all the adventurers and dragons and stores them locally.
@@ -503,8 +418,14 @@ def insert_adventurers(cursorObj, row):
                 manaSpiral = "yes"
             else:
                 manaSpiral = "no"
+
             skillOne, skillOneDesc = separate_skill_desc(row[9])
-            skillTwo, skillTwoDesc = separate_skill_desc(row[10])
+            # check if adventurer only has one skill
+            if row[10] == "-":
+                skillTwo = row[10]
+                skillTwoDesc = row[10]
+            else:
+                skillTwo, skillTwoDesc = separate_skill_desc(row[10])
             cursorObj.execute(sql, (row[0], unidecode.unidecode(row[1]), row[2], row[3], row[4],
                                     row[5], row[6], skillOne, skillOneDesc,
                                     skillTwo, skillTwoDesc, row[11].replace(" (Co-ability)", ""), row[12], row[13],
@@ -560,44 +481,6 @@ def insert_wyrmprints(cursorObj, row):
             print(f"From insert_wyrmprints():\n\tDatabase Error: {error}")
 
 
-def insert_void_schedule(cursorObj, row):
-    """
-    Inserts double-drop void schedule info into table.
-    :param cursorObj: cursor pointing to sqlite database
-    :param row: list containing information about void schedule
-    :return: none
-    """
-    sql = '''REPLACE INTO VoidSchedule
-                    (quest, monday, tuesday, wednesday, thursday, friday, saturday, sunday) 
-                VALUES
-                    (?,?,?,?,?,?,?,?);
-        '''
-    if len(row) != 0:
-        try:
-            cursorObj.execute(sql, (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],))
-        except sqlite3.IntegrityError as error:
-            print(f"From insert_void_schedule():\n\tDatabase Error: {error}")
-
-
-def insert_master_dragon_schedule(cursorObj, row):
-    """
-    Inserts master dragon schedule info into table.
-    :param cursorObj: cursor pointing to sqlite database
-    :param row: list containing information about master dragon schedule
-    :return: none
-    """
-    sql = '''REPLACE INTO MasterDragonSchedule
-                    (quest, monday, tuesday, wednesday, thursday, friday, saturday, sunday) 
-                VALUES
-                    (?,?,?,?,?,?,?,?);
-        '''
-    if len(row) != 0:
-        try:
-            cursorObj.execute(sql, (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],))
-        except sqlite3.IntegrityError as error:
-            print(f"From insert_void_schedule():\n\tDatabase Error: {error}")
-
-
 def main():
     connection = sqlite3.connect("dragalia.db")
     cursorObj = connection.cursor()
@@ -605,15 +488,11 @@ def main():
     initialize_adventurers(cursorObj)
     initialize_dragons(cursorObj)
     initialize_wyrmprints(cursorObj)
-    initialize_void_schedule(cursorObj)
-    initialize_master_dragon_schedule(cursorObj)
 
     print("Now updating database...")
     update_adventurers(cursorObj)
     update_dragons(cursorObj)
     update_wyrmprints(cursorObj)
-    update_void_schedule(cursorObj)
-    update_master_dragon_schedule(cursorObj)
 
     print("Now downloading images...")
     download_images(cursorObj)

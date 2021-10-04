@@ -5,13 +5,9 @@ import info_methods
 import wp_methods
 import findwp_methods
 import manaspiral_methods
-import schedule_methods
 import emojis
 import string
 import unidecode
-import aiocron
-import datetime
-
 
 ADVENTURER = "adventurer"
 DRAGON = "dragon"
@@ -28,37 +24,6 @@ print("Program now running...")
 async def on_ready():
     print("Estelle-bot is now running.")
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("?commands"))
-
-
-@aiocron.crontab("30 10 * * *")
-async def show_schedule():
-    # bot will display schedule at 10:00 AM EST every day
-    channel = bot.get_channel(BOT_CHANNEL)
-    # returns an integer 0-6 representing weekday
-    dayOfWeek = datetime.datetime.today().weekday()
-    dt = datetime.datetime.today()
-
-    embed = discord.Embed(title="("+str(dt.month)+"/"+str(dt.day)+") Schedule for Today and Tomorrow",
-                          color=0x3D85C6)
-    embed.add_field(name=emojis.VOID_ICON + " Today's 2x Void Battles",
-                    value=schedule_methods.pretty_print(schedule_methods.make_void_list(dayOfWeek)),
-                    inline=False)
-    embed.add_field(name=emojis.HDT_ICON + " Today's Available Master Dragons",
-                    value=schedule_methods.pretty_print(schedule_methods.make_master_dragon_list(dayOfWeek)),
-                    inline=False)
-    embed.add_field(name="\u200b",
-                    value="\u200b",
-                    inline=False)
-    embed.add_field(name=emojis.VOID_ICON + " Tomorrow's 2x Void Battles",
-                    value=schedule_methods.pretty_print(schedule_methods.make_void_list((dayOfWeek+1) % 7)),
-                    inline=False)
-    embed.add_field(name=emojis.HDT_ICON + " Tomorrow's Available Master Dragons",
-                    value=schedule_methods.pretty_print(schedule_methods.make_master_dragon_list((dayOfWeek + 1) % 7)),
-                    inline=False)
-
-    footerTip = "\nType ?commands to get a list of available commands."
-    embed.set_footer(text=footerTip)
-    await channel.send(embed=embed)
 
 
 @bot.event
@@ -103,6 +68,7 @@ async def info(ctx, *, arg: str):
         else:
             # entity is an adventurer
             if entityDict["type"] == ADVENTURER:
+                hasTwoSkills = True
                 name = entityDict["name"].replace(" ", "_")
                 emojiString = info_methods.get_adv_emojis(entityDict["rarity"], entityDict["element"],
                                                           entityDict["weapon"], entityDict["class"],
@@ -114,6 +80,8 @@ async def info(ctx, *, arg: str):
                 formattedName = name.replace(" ", "_")
                 skillOneDescription = info_methods.print_skills(entityDict["skill_one"], entityDict["skill_one_desc"],
                                                                 ADVENTURER)
+                if entityDict["skill_two"] == "-" and entityDict["skill_two_desc"] == "-":
+                    hasTwoSkills = False
                 skillTwoDescription = info_methods.print_skills(entityDict["skill_two"], entityDict["skill_two_desc"],
                                                                 ADVENTURER)
                 abilities = info_methods.print_abilities([entityDict["ability_one"], entityDict["ability_two"],
@@ -126,11 +94,11 @@ async def info(ctx, *, arg: str):
                 else:
                     embed.add_field(name="Skill 1", value=skillOneDescription, inline=False)
 
-                if len(skillTwoDescription) > 1024:
+                if len(skillTwoDescription) > 1024 and hasTwoSkills:
                     embedCharLimit = "(This character's skill description exceeds Discord's character limit. " \
                                      "Please see the wiki link below for the full description.)"
                     embed.add_field(name="Skill 2", value=embedCharLimit, inline=False)
-                else:
+                elif hasTwoSkills:
                     embed.add_field(name="Skill 2", value=skillTwoDescription, inline=False)
 
                 embed.add_field(name="Abilities", value=abilities, inline=False)
